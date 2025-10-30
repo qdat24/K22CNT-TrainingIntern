@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}Tài Khoản - Nội Thất ABC{% endblock %}
+
+{% block content %}
+<div class="account-section">
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-circle' }}"></i>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <div class="account-container">
+            <aside class="account-sidebar">
+                <h3><i class="fas fa-user-circle"></i> {{ customer.full_name }}</h3>
+                <ul class="account-menu">
+                    <li><a href="#info" class="active"><i class="fas fa-info-circle"></i> Thông tin tài khoản</a></li>
+                    <li><a href="#orders"><i class="fas fa-shopping-bag"></i> Đơn hàng của tôi</a></li>
+                    <li><a href="#password"><i class="fas fa-key"></i> Đổi mật khẩu</a></li>
+                    <li><a href="{{ url_for('customer_logout') }}"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a></li>
+                </ul>
+            </aside>
+            
+            <main class="account-content">
+                <section id="info">
+                    <h2>Thông Tin Tài Khoản</h2>
+                    <form method="POST" action="{{ url_for('update_customer_info') }}">
+                        <div class="form-group">
+                            <label for="full_name">Họ và tên</label>
+                            <input type="text" id="full_name" name="full_name" value="{{ customer.full_name }}" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" value="{{ customer.email }}" disabled>
+                            <small style="color: var(--text-light);">Email không thể thay đổi</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone">Số điện thoại</label>
+                            <input type="tel" id="phone" name="phone" value="{{ customer.phone or '' }}">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="address">Địa chỉ</label>
+                            <textarea id="address" name="address" rows="3">{{ customer.address or '' }}</textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Cập Nhật
+                        </button>
+                    </form>
+                </section>
+                
+                <section id="orders" class="mt-5">
+                    <h2>Đơn Hàng Của Tôi</h2>
+                    {% if orders %}
+                        <ul class="orders-list">
+                            {% for order in orders %}
+                            <li class="order-item">
+                                <div class="order-header">
+                                    <span class="order-id">#{{ order.order_id }}</span>
+                                    <span class="order-status {{ order.status }}">
+                                        {% if order.status == 'pending' %}
+                                            ⏳ Chờ xác nhận
+                                        {% elif order.status == 'confirmed' %}
+                                            ✓ Đã xác nhận
+                                        {% elif order.status == 'shipping' %}
+                                            🚚 Đang giao
+                                        {% elif order.status == 'completed' %}
+                                            ✓ Đã hoàn thành
+                                        {% elif order.status == 'cancelled' %}
+                                            ✗ Đã hủy
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                <div class="order-details">
+                                    <p><strong>Ngày đặt:</strong> {{ order.created_at.strftime('%d/%m/%Y %H:%M') }}</p>
+                                    <p><strong>Phương thức thanh toán:</strong> 
+                                        {% if order.payment_method == 'cod' %}
+                                            COD (Thanh toán khi nhận hàng)
+                                        {% elif order.payment_method == 'bank_transfer' %}
+                                            Chuyển khoản ngân hàng
+                                        {% elif order.payment_method == 'credit_card' %}
+                                            Thẻ tín dụng
+                                        {% endif %}
+                                    </p>
+                                    <p><strong>Trạng thái thanh toán:</strong> 
+                                        {% if order.payment_status == 'pending' %}
+                                            <span style="color: #f39c12;">⏳ Chưa thanh toán</span>
+                                        {% elif order.payment_status == 'paid' %}
+                                            <span style="color: #27ae60;">✓ Đã thanh toán</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                <div class="order-total">
+                                    Tổng tiền: <strong style="color: #e74c3c;">{{ "{:,.0f}".format(order.total) }} ₫</strong>
+                                </div>
+                                <div style="margin-top: 15px; display: flex; gap: 10px;">
+                                    <a href="{{ url_for('customer_order_detail', order_id=order.order_id) }}" class="btn btn-primary" style="flex: 1;">
+                                        <i class="fas fa-eye"></i> Xem Chi Tiết
+                                    </a>
+                                    {% if order.status == 'pending' %}
+                                    <form method="POST" action="{{ url_for('customer_cancel_order', order_id=order.order_id) }}" 
+                                          onsubmit="return confirm('Bạn có chắc muốn hủy đơn hàng này?')" style="flex: 1;">
+                                        <button type="submit" class="btn" style="width: 100%; background: #e74c3c; color: white;">
+                                            <i class="fas fa-times"></i> Hủy Đơn
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p style="text-align: center; color: var(--text-light); padding: 3rem;">
+                            <i class="fas fa-shopping-bag" style="font-size: 3rem; display: block; margin-bottom: 1rem;"></i>
+                            Bạn chưa có đơn hàng nào
+                        </p>
+                    {% endif %}
+                </section>
+                
+                <section id="password" class="mt-5">
+                    <h2>Đổi Mật Khẩu</h2>
+                    <form method="POST" action="{{ url_for('change_customer_password') }}">
+                        <div class="form-group">
+                            <label for="current_password">Mật khẩu hiện tại</label>
+                            <input type="password" id="current_password" name="current_password" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="new_password">Mật khẩu mới</label>
+                            <input type="password" id="new_password" name="new_password" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="confirm_password">Xác nhận mật khẩu mới</label>
+                            <input type="password" id="confirm_password" name="confirm_password" required>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-key"></i> Đổi Mật Khẩu
+                        </button>
+                    </form>
+                </section>
+            </main>
+        </div>
+    </div>
+</div>
+
+<script>
+// Smooth scroll cho account menu
+document.querySelectorAll('.account-menu a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        if (this.getAttribute('href') !== '#') {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                
+                // Update active class
+                document.querySelectorAll('.account-menu a').forEach(a => a.classList.remove('active'));
+                this.classList.add('active');
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

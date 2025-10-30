@@ -1,0 +1,99 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{% if action == 'add' %}Thêm Sản Phẩm{% else %}Sửa Sản Phẩm{% endif %}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>{% if action == 'add' %}➕ Thêm Sản Phẩm Mới{% else %}✏️ Sửa Sản Phẩm{% endif %}</h1>
+    <p>Điền thông tin sản phẩm</p>
+</div>
+
+<div class="card">
+    <form method="POST" action="{% if action == 'add' %}{{ url_for('admin_add_product') }}{% else %}{{ url_for('admin_edit_product', product_id=product.id) }}{% endif %}">
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+            <div style="grid-column: 1 / -1;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600;">Tên Sản Phẩm *</label>
+                <input type="text" name="name" value="{{ product.name if product else '' }}" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px;">
+            </div>
+
+            <div>
+                <label style="display: block; margin-bottom: 8px; font-weight: 600;">Danh Mục *</label>
+                <select name="category" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px;">
+                    <option value="">-- Chọn danh mục --</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat }}" {% if product and product.category == cat %}selected{% endif %}>{{ cat }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label style="display: block; margin-bottom: 8px; font-weight: 600;">Giá Bán (VNĐ) *</label>
+                <input type="number" name="price" value="{{ product.price if product else '' }}" required min="0" step="1000" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px;">
+            </div>
+
+            <div>
+                <label style="display: block; margin-bottom: 8px; font-weight: 600;">Giá Gốc (VNĐ) *</label>
+                <input type="number" name="original_price" value="{{ product.original_price if product else '' }}" required min="0" step="1000" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px;">
+            </div>
+
+            <div>
+                <label style="display: block; margin-bottom: 8px; font-weight: 600;">Đánh Giá (1-5)</label>
+                <input type="number" name="rating" value="{{ product.rating if product else '5.0' }}" min="1" max="5" step="0.1" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px;">
+            </div>
+
+            <div>
+                <label style="display: block; margin-bottom: 8px; font-weight: 600;">Số Lượt Đánh Giá</label>
+                <input type="number" name="reviews" value="{{ product.reviews if product else '0' }}" min="0" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px;">
+            </div>
+
+            <div>
+                <label style="display: block; margin-bottom: 8px; font-weight: 600;">Số Lượng Tồn Kho</label>
+                <input type="number" name="stock" value="{{ product.stock if product else '100' }}" min="0" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px;">
+            </div>
+
+            {% if action == 'edit' %}
+            <div>
+                <label style="display: block; margin-bottom: 8px; font-weight: 600;">Trạng Thái</label>
+                <label style="display: flex; align-items: center; gap: 10px; padding: 10px;">
+                    <input type="checkbox" name="is_active" {% if product and product.is_active %}checked{% endif %} style="width: 20px; height: 20px;">
+                    <span>Hoạt động (hiển thị trên website)</span>
+                </label>
+            </div>
+            {% endif %}
+
+            <div style="grid-column: 1 / -1;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600;">URL Hình Ảnh</label>
+                <input type="url" name="image" value="{{ product.image if product else '' }}" placeholder="https://example.com/image.jpg" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px;">
+                <small style="color: #666; font-size: 12px;">Dán link hình ảnh từ Unsplash hoặc nguồn khác</small>
+            </div>
+
+            <div style="grid-column: 1 / -1;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600;">Mô Tả Sản Phẩm</label>
+                <textarea name="description" rows="4" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px;">{{ product.description if product else '' }}</textarea>
+            </div>
+
+            <div style="grid-column: 1 / -1;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600;">Tính Năng (mỗi dòng 1 tính năng)</label>
+                <textarea name="features" rows="5" placeholder="Chất liệu gỗ sồi tự nhiên&#10;Thiết kế hiện đại&#10;Bảo hành 2 năm" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px;">{% if product and product.features %}{{ product.features|join('\n') }}{% endif %}</textarea>
+                <small style="color: #666; font-size: 12px;">Mỗi tính năng trên một dòng riêng</small>
+            </div>
+        </div>
+
+        <div style="margin-top: 30px; display: flex; gap: 10px;">
+            <button type="submit" class="btn btn-success">💾 Lưu Sản Phẩm</button>
+            <a href="{{ url_for('admin_products') }}" class="btn btn-danger">❌ Hủy</a>
+        </div>
+    </form>
+</div>
+
+{% if product and product.image %}
+<div class="card" style="margin-top: 20px;">
+    <div class="card-header">
+        <h3>Xem Trước Hình Ảnh</h3>
+    </div>
+    <div style="text-align: center;">
+        <img src="{{ product.image }}" alt="{{ product.name }}" style="max-width: 100%; max-height: 400px; object-fit: contain; border-radius: 10px;">
+    </div>
+</div>
+{% endif %}
+{% endblock %}

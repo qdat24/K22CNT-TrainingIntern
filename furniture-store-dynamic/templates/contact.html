@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block title %}Liên Hệ - Nội Thất Sang Trọng{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section style="background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); color: white; padding: 60px 0; text-align: center;">
+    <div class="container">
+        <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">
+            <i class="fas fa-phone-alt"></i> Liên Hệ
+        </h1>
+        <p style="font-size: 1.2rem;">Chúng tôi sẵn sàng hỗ trợ bạn 24/7</p>
+    </div>
+</section>
+
+<!-- Content -->
+<section style="padding: 60px 0; background: #f8f9fa;">
+    <div class="container">
+        <div style="max-width: 1000px; margin: 0 auto;">
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-bottom: 3rem;">
+                
+                <!-- Contact Info -->
+                <div>
+                    <h2 style="color: #2c3e50; margin-bottom: 2rem; font-size: 1.8rem;">Thông Tin Liên Hệ</h2>
+                    
+                    <div style="background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 1.5rem;">
+                        <div style="display: flex; align-items: start; gap: 1rem;">
+                            <div style="font-size: 2rem; color: #e67e22;">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div>
+                                <h3 style="color: #2c3e50; margin-bottom: 0.5rem;">Địa Chỉ</h3>
+                                <p style="color: #7f8c8d; line-height: 1.6;">
+                                    123 Đường ABC, Quận XYZ<br>
+                                    Thành phố Hồ Chí Minh<br>
+                                    Việt Nam
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 1.5rem;">
+                        <div style="display: flex; align-items: start; gap: 1rem;">
+                            <div style="font-size: 2rem; color: #3498db;">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <div>
+                                <h3 style="color: #2c3e50; margin-bottom: 0.5rem;">Điện Thoại</h3>
+                                <p style="color: #7f8c8d; line-height: 1.6;">
+                                    Hotline: <strong>1900-xxxx</strong><br>
+                                    Mobile: <strong>0901-234-567</strong><br>
+                                    (8:00 - 22:00, cả tuần)
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 1.5rem;">
+                        <div style="display: flex; align-items: start; gap: 1rem;">
+                            <div style="font-size: 2rem; color: #27ae60;">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div>
+                                <h3 style="color: #2c3e50; margin-bottom: 0.5rem;">Email</h3>
+                                <p style="color: #7f8c8d; line-height: 1.6;">
+                                    Hỗ trợ: <strong>support@noithat.vn</strong><br>
+                                    Kinh doanh: <strong>sales@noithat.vn</strong><br>
+                                    (Phản hồi trong 24h)
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                        <div style="display: flex; align-items: start; gap: 1rem;">
+                            <div style="font-size: 2rem; color: #9b59b6;">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div>
+                                <h3 style="color: #2c3e50; margin-bottom: 0.5rem;">Giờ Làm Việc</h3>
+                                <p style="color: #7f8c8d; line-height: 1.6;">
+                                    Thứ 2 - Chủ nhật: <strong>8:00 - 22:00</strong><br>
+                                    Lễ, Tết: <strong>9:00 - 18:00</strong>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Contact Form -->
+                <div>
+                    <h2 style="color: #2c3e50; margin-bottom: 2rem; font-size: 1.8rem;">Gửi Tin Nhắn</h2>
+                    
+                    <form id="contactForm" style="background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                        
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #2c3e50;">
+                                Họ và tên <span style="color: red;">*</span>
+                            </label>
+                            <input type="text" name="name" required 
+                                   style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 5px; font-size: 1rem;"
+                                   placeholder="Nhập họ tên của bạn">
+                        </div>
+
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #2c3e50;">
+                                Email <span style="color: red;">*</span>
+                            </label>
+                            <input type="email" name="email" required 
+                                   style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 5px; font-size: 1rem;"
+                                   placeholder="email@example.com">
+                        </div>
+
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #2c3e50;">
+                                Số điện thoại
+                            </label>
+                            <input type="tel" name="phone" 
+                                   style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 5px; font-size: 1rem;"
+                                   placeholder="0901234567">
+                        </div>
+
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #2c3e50;">
+                                Chủ đề
+                            </label>
+                            <select name="subject" 
+                                    style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 5px; font-size: 1rem;">
+                                <option>Tư vấn sản phẩm</option>
+                                <option>Hỗ trợ đơn hàng</option>
+                                <option>Khiếu nại</option>
+                                <option>Bảo hành</option>
+                                <option>Khác</option>
+                            </select>
+                        </div>
+
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #2c3e50;">
+                                Nội dung <span style="color: red;">*</span>
+                            </label>
+                            <textarea name="message" required rows="5"
+                                      style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 5px; font-size: 1rem; resize: vertical;"
+                                      placeholder="Nhập nội dung tin nhắn của bạn..."></textarea>
+                        </div>
+
+                        <button type="submit" class="btn" style="width: 100%; padding: 15px; font-size: 1.1rem;">
+                            <i class="fas fa-paper-plane"></i> Gửi Tin Nhắn
+                        </button>
+
+                    </form>
+                </div>
+
+            </div>
+
+            <!-- Map -->
+            <div style="background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                <h2 style="color: #2c3e50; margin-bottom: 1.5rem; font-size: 1.8rem;">
+                    <i class="fas fa-map"></i> Vị Trí Showroom
+                </h2>
+                <div style="width: 100%; height: 400px; border-radius: 10px; overflow: hidden;">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3724.4781408048125!2d105.80874507393352!3d21.013546088303517!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135ab438bbafeeb%3A0xb97ca6f7e88ba308!2sDevmaster!5e0!3m2!1svi!2sus!4v1761671716128!5m2!1svi!2sus" width="800" height="600" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>            </div>
+
+        </div>
+    </div>
+</section>
+
+<script>
+document.getElementById('contactForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const data = Object.fromEntries(formData.entries());
+    
+    // Simulate sending
+    const btn = this.querySelector('button[type="submit"]');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang gửi...';
+    btn.disabled = true;
+    
+    setTimeout(() => {
+        alert('Cảm ơn bạn đã liên hệ! Chúng tôi sẽ phản hồi trong vòng 24h.');
+        this.reset();
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }, 1500);
+});
+</script>
+{% endblock %}

@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}Giỏ Hàng - Nội Thất Sang Trọng{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section style="background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); color: white; padding: 40px 0; text-align: center;">
+    <div class="container">
+        <h1 style="font-size: 2rem; margin-bottom: 0.5rem;">
+            <i class="fas fa-shopping-cart"></i> Giỏ Hàng Của Bạn
+        </h1>
+    </div>
+</section>
+
+<!-- Cart Section -->
+<section class="cart-section">
+    <div class="container">
+        {% if cart_items %}
+        <!-- Cart Table -->
+        <div class="cart-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sản Phẩm</th>
+                        <th>Đơn Giá</th>
+                        <th>Số Lượng</th>
+                        <th>Thành Tiền</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart_items %}
+                    <tr>
+                        <td>
+                            <div class="cart-product-info">
+                                <img src="{{ item.product.image }}" alt="{{ item.product.name }}" class="cart-product-img">
+                                <div>
+                                    <strong>{{ item.product.name }}</strong>
+                                    <div style="color: #7f8c8d; font-size: 0.9rem; margin-top: 0.3rem;">
+                                        {{ item.product.category }}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <strong style="color: #e67e22;">{{ "{:,.0f}".format(item.product.price) }} VNĐ</strong>
+                        </td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <button class="quantity-btn" onclick="updateCartQuantity({{ item.product.id }}, {{ item.quantity - 1 }})">-</button>
+                                <input type="number" class="quantity-input" value="{{ item.quantity }}" 
+                                       onchange="updateCartQuantity({{ item.product.id }}, this.value)" 
+                                       style="width: 60px; text-align: center;">
+                                <button class="quantity-btn" onclick="updateCartQuantity({{ item.product.id }}, {{ item.quantity + 1 }})">+</button>
+                            </div>
+                        </td>
+                        <td>
+                            <strong style="color: #2c3e50; font-size: 1.1rem;">{{ "{:,.0f}".format(item.subtotal) }} VNĐ</strong>
+                        </td>
+                        <td>
+                            <button onclick="removeFromCart({{ item.product.id }})" 
+                                    style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 1.2rem;"
+                                    title="Xóa sản phẩm">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Cart Summary -->
+        <div class="cart-summary">
+            <h3>Tổng Đơn Hàng</h3>
+            <div class="summary-row">
+                <span>Tạm tính:</span>
+                <span>{{ "{:,.0f}".format(subtotal) }} VNĐ</span>
+            </div>
+            <div class="summary-row">
+                <span>Phí vận chuyển:</span>
+                <span>
+                    {% if shipping_fee == 0 %}
+                    <span style="color: #27ae60; font-weight: bold;">Miễn phí</span>
+                    {% else %}
+                    {{ "{:,.0f}".format(shipping_fee) }} VNĐ
+                    {% endif %}
+                </span>
+            </div>
+            <div class="summary-row" style="border-top: 2px solid #ddd; padding-top: 1rem; margin-top: 1rem;">
+                <span style="font-size: 1.2rem; font-weight: bold;">Tổng cộng:</span>
+                <span class="summary-total">{{ "{:,.0f}".format(total) }} VNĐ</span>
+            </div>
+            {% if subtotal < 5000000 %}
+            <div style="background: #fff3cd; color: #856404; padding: 1rem; border-radius: 5px; margin: 1rem 0; font-size: 0.9rem;">
+                <i class="fas fa-info-circle"></i>
+                Mua thêm {{ "{:,.0f}".format(5000000 - subtotal) }} VNĐ để được miễn phí vận chuyển!
+            </div>
+            {% endif %}
+            <button class="btn" onclick="window.location.href='/checkout'" 
+                    style="width: 100%; padding: 15px; font-size: 1.1rem; margin-top: 1rem;">
+                <i class="fas fa-check-circle"></i> Tiến Hành Thanh Toán
+            </button>
+            <a href="/products" style="display: block; text-align: center; margin-top: 1rem; color: #3498db; text-decoration: none;">
+                <i class="fas fa-arrow-left"></i> Tiếp tục mua sắm
+            </a>
+        </div>
+
+        <!-- Shipping Info -->
+        <div style="margin-top: 3rem; background: #e3f2fd; padding: 2rem; border-radius: 10px;">
+            <h3 style="color: #1976d2; margin-bottom: 1rem;">
+                <i class="fas fa-shipping-fast"></i> Thông Tin Vận Chuyển
+            </h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+                <div>
+                    <i class="fas fa-check-circle" style="color: #27ae60;"></i>
+                    <strong> Miễn phí vận chuyển</strong>
+                    <p style="color: #666; font-size: 0.9rem; margin-top: 0.3rem;">
+                        Cho đơn hàng từ 5 triệu trở lên
+                    </p>
+                </div>
+                <div>
+                    <i class="fas fa-clock" style="color: #f39c12;"></i>
+                    <strong> Giao hàng nhanh</strong>
+                    <p style="color: #666; font-size: 0.9rem; margin-top: 0.3rem;">
+                        Từ 3-7 ngày làm việc
+                    </p>
+                </div>
+                <div>
+                    <i class="fas fa-shield-alt" style="color: #3498db;"></i>
+                    <strong> An toàn & Bảo mật</strong>
+                    <p style="color: #666; font-size: 0.9rem; margin-top: 0.3rem;">
+                        Đảm bảo hàng nguyên vẹn
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        {% else %}
+        <!-- Empty Cart -->
+        <div style="text-align: center; padding: 80px 0;">
+            <i class="fas fa-shopping-cart" style="font-size: 5rem; color: #ddd; margin-bottom: 1rem;"></i>
+            <h2 style="color: #7f8c8d; margin-bottom: 1rem;">Giỏ Hàng Trống</h2>
+            <p style="color: #95a5a6; margin-bottom: 2rem;">Hãy thêm sản phẩm vào giỏ hàng để tiếp tục mua sắm</p>
+            <a href="/products" class="btn">
+                <i class="fas fa-shopping-bag"></i> Khám Phá Sản Phẩm
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

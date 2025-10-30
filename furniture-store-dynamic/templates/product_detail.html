@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} - Nội Thất Sang Trọng{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<section style="background: #f8f9fa; padding: 1rem 0;">
+    <div class="container">
+        <nav style="color: #7f8c8d;">
+            <a href="/" style="color: #7f8c8d; text-decoration: none;">Trang chủ</a> / 
+            <a href="/products" style="color: #7f8c8d; text-decoration: none;">Sản phẩm</a> / 
+            <a href="/products?category={{ product.category }}" style="color: #7f8c8d; text-decoration: none;">{{ product.category }}</a> / 
+            <span style="color: #2c3e50;">{{ product.name }}</span>
+        </nav>
+    </div>
+</section>
+
+<!-- Product Detail -->
+<section class="product-detail">
+    <div class="container">
+        <div class="product-detail-container">
+            <div>
+                <img src="{{ product.image }}" alt="{{ product.name }}" class="product-image-large">
+            </div>
+            <div class="product-detail-info">
+                <div class="product-category" style="font-size: 1rem;">{{ product.category }}</div>
+                <h1>{{ product.name }}</h1>
+                
+                <div class="product-rating">
+                    <span class="stars" style="font-size: 1.2rem;">
+                        {% for i in range(5) %}
+                            {% if i < product.rating %}
+                                <i class="fas fa-star"></i>
+                            {% else %}
+                                <i class="far fa-star"></i>
+                            {% endif %}
+                        {% endfor %}
+                    </span>
+                    <span style="margin-left: 0.5rem;">
+                        <strong>{{ product.rating }}</strong>/5 ({{ product.reviews }} đánh giá)
+                    </span>
+                </div>
+
+                <div class="product-detail-price">
+                    <span class="price" style="font-size: 2rem;">{{ product.price | format_currency }}</span>
+                    {% if product.original_price > product.price %}
+                    <span class="original-price" style="font-size: 1.3rem;">{{ product.original_price | format_currency }}</span>
+                    <span class="product-badge" style="position: static; margin-left: 1rem;">
+                        Giảm {{ ((product.original_price - product.price) / product.original_price * 100) | int }}%
+                    </span>
+                    {% endif %}
+                </div>
+
+                <div class="product-description">
+                    <p>{{ product.description }}</p>
+                </div>
+
+                <div class="product-features">
+                    <h3>Đặc điểm nổi bật</h3>
+                    <ul>
+                        {% for feature in product.features %}
+                        <li>{{ feature }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="quantity-selector">
+                    <label style="font-weight: 600; margin-right: 1rem;">Số lượng:</label>
+                    <button class="quantity-btn quantity-minus">-</button>
+                    <input type="number" class="quantity-input" value="1" min="1">
+                    <button class="quantity-btn quantity-plus">+</button>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button class="btn" onclick="addToCart({{ product.id }}, parseInt(document.querySelector('.quantity-input').value))" 
+                            style="flex: 1; padding: 15px;">
+                        <i class="fas fa-shopping-cart"></i> Thêm Vào Giỏ Hàng
+                    </button>
+                    <button class="btn" onclick="addToCart({{ product.id }}, parseInt(document.querySelector('.quantity-input').value)); setTimeout(() => window.location.href='/cart', 500);" 
+                            style="flex: 1; padding: 15px; background: #27ae60;">
+                        <i class="fas fa-bolt"></i> Mua Ngay
+                    </button>
+                </div>
+
+                <div style="margin-top: 2rem; padding: 1.5rem; background: #f8f9fa; border-radius: 10px;">
+                    <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+                        <div>
+                            <i class="fas fa-shipping-fast" style="color: #e67e22; margin-right: 0.5rem;"></i>
+                            <strong>Miễn phí vận chuyển</strong>
+                            <p style="color: #7f8c8d; font-size: 0.9rem; margin-top: 0.3rem;">Cho đơn hàng từ 5 triệu</p>
+                        </div>
+                        <div>
+                            <i class="fas fa-shield-alt" style="color: #e67e22; margin-right: 0.5rem;"></i>
+                            <strong>Bảo hành 2 năm</strong>
+                            <p style="color: #7f8c8d; font-size: 0.9rem; margin-top: 0.3rem;">Cam kết chất lượng</p>
+                        </div>
+                        <div>
+                            <i class="fas fa-exchange-alt" style="color: #e67e22; margin-right: 0.5rem;"></i>
+                            <strong>Đổi trả 30 ngày</strong>
+                            <p style="color: #7f8c8d; font-size: 0.9rem; margin-top: 0.3rem;">Nếu có lỗi từ nhà sản xuất</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Related Products -->
+{% if related_products %}
+<section class="products-section" style="background: #f8f9fa;">
+    <div class="container">
+        <h2 class="section-title">Sản Phẩm Liên Quan</h2>
+        <div class="products-grid">
+            {% for product in related_products %}
+            <div class="product-card" onclick="window.location.href='/product/{{ product.id }}'">
+                <div class="product-image-wrapper">
+                    <img src="{{ product.image }}" alt="{{ product.name }}" class="product-image">
+                    {% if product.original_price > product.price %}
+                    <span class="product-badge">
+                        -{{ ((product.original_price - product.price) / product.original_price * 100) | int }}%
+                    </span>
+                    {% endif %}
+                </div>
+                <div class="product-info">
+                    <div class="product-category">{{ product.category }}</div>
+                    <h3 class="product-name">{{ product.name }}</h3>
+                    <div class="product-rating">
+                        <span class="stars">
+                            {% for i in range(5) %}
+                                {% if i < product.rating %}
+                                    <i class="fas fa-star"></i>
+                                {% else %}
+                                    <i class="far fa-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </span>
+                        <span style="color: #7f8c8d; font-size: 0.9rem;">({{ product.reviews }})</span>
+                    </div>
+                    <div class="product-price">
+                        <span class="price">{{ product.price | format_currency }}</span>
+                        {% if product.original_price > product.price %}
+                        <span class="original-price">{{ product.original_price | format_currency }}</span>
+                        {% endif %}
+                    </div>
+                    <button class="btn" onclick="event.stopPropagation(); addToCart({{ product.id }})" style="width: 100%;">
+                        <i class="fas fa-shopping-cart"></i> Thêm Vào Giỏ
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Đặt Hàng Thành Công - Nội Thất Sang Trọng{% endblock %}
+
+{% block content %}
+<!-- Success Section -->
+<section style="min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 60px 0;">
+    <div class="container">
+        <div style="max-width: 700px; margin: 0 auto; text-align: center;">
+            
+            <!-- Success Icon -->
+            <div style="width: 120px; height: 120px; background: linear-gradient(135deg, #27ae60, #2ecc71); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem; animation: scaleIn 0.5s;">
+                <i class="fas fa-check" style="font-size: 4rem; color: white;"></i>
+            </div>
+            
+            <h1 style="font-size: 2.5rem; color: #2c3e50; margin-bottom: 1rem; animation: fadeInUp 0.6s;">
+                Đặt Hàng Thành Công!
+            </h1>
+            
+            <p style="font-size: 1.2rem; color: #7f8c8d; margin-bottom: 2rem; animation: fadeInUp 0.6s 0.1s backwards;">
+                Cảm ơn bạn đã mua hàng tại Nội Thất Sang
+            </p>
+            
+            <!-- Order Info -->
+            <div style="background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 20px rgba(0,0,0,0.1); margin-bottom: 2rem; animation: fadeInUp 0.6s 0.2s backwards;">
+                <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 5px; margin-bottom: 1.5rem;">
+                    <div style="color: #7f8c8d; margin-bottom: 0.5rem;">Mã đơn hàng của bạn</div>
+                    <div style="font-size: 1.8rem; font-weight: bold; color: #e67e22; font-family: 'Courier New', monospace;">
+                        #{{ order_id }}
+                    </div>
+                </div>
+                
+                <div style="text-align: left; color: #555;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                        <div>
+                            <i class="fas fa-user" style="color: #3498db; margin-right: 0.5rem;"></i>
+                            <strong>Người nhận:</strong> {{ order.customer_name }}
+                        </div>
+                        <div>
+                            <i class="fas fa-phone" style="color: #3498db; margin-right: 0.5rem;"></i>
+                            <strong>SĐT:</strong> {{ order.phone }}
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <i class="fas fa-map-marker-alt" style="color: #3498db; margin-right: 0.5rem;"></i>
+                        <strong>Địa chỉ:</strong> {{ order.address }}
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <i class="fas fa-wallet" style="color: #3498db; margin-right: 0.5rem;"></i>
+                        <strong>Thanh toán:</strong> 
+                        {% if order.payment_method == 'cod' %}
+                        Thanh toán khi nhận hàng (COD)
+                        {% elif order.payment_method == 'bank_transfer' %}
+                        Chuyển khoản ngân hàng
+                        {% elif order.payment_method == 'credit_card' %}
+                        Thẻ tín dụng/Ghi nợ
+                        {% endif %}
+                    </div>
+                    <div style="padding-top: 1rem; border-top: 2px solid #e0e0e0;">
+                        <i class="fas fa-money-bill-wave" style="color: #27ae60; margin-right: 0.5rem;"></i>
+                        <strong>Tổng tiền:</strong> 
+                        <span style="font-size: 1.5rem; color: #e67e22; font-weight: bold;">
+                            {{ order.total | format_currency }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Next Steps -->
+            <div style="background: #e3f2fd; padding: 2rem; border-radius: 10px; margin-bottom: 2rem; text-align: left; animation: fadeInUp 0.6s 0.3s backwards;">
+                <h3 style="color: #1976d2; margin-bottom: 1rem;">
+                    <i class="fas fa-info-circle"></i> Bước Tiếp Theo
+                </h3>
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                    <li style="padding: 0.8rem 0; border-bottom: 1px solid #bbdefb;">
+                        <i class="fas fa-check-circle" style="color: #27ae60; margin-right: 0.8rem;"></i>
+                        Chúng tôi đã gửi email xác nhận đến <strong>{{ order.email }}</strong>
+                    </li>
+                    <li style="padding: 0.8rem 0; border-bottom: 1px solid #bbdefb;">
+                        <i class="fas fa-clock" style="color: #f39c12; margin-right: 0.8rem;"></i>
+                        Đơn hàng sẽ được xử lý trong vòng <strong>24 giờ</strong>
+                    </li>
+                    <li style="padding: 0.8rem 0; border-bottom: 1px solid #bbdefb;">
+                        <i class="fas fa-truck" style="color: #3498db; margin-right: 0.8rem;"></i>
+                        Thời gian giao hàng dự kiến: <strong>3-7 ngày làm việc</strong>
+                    </li>
+                    <li style="padding: 0.8rem 0;">
+                        <i class="fas fa-phone-alt" style="color: #e67e22; margin-right: 0.8rem;"></i>
+                        Chúng tôi sẽ liên hệ với bạn để xác nhận đơn hàng
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- Actions -->
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; animation: fadeInUp 0.6s 0.4s backwards;">
+                <a href="/products" class="btn" style="padding: 15px 30px;">
+                    <i class="fas fa-shopping-bag"></i> Tiếp Tục Mua Sắm
+                </a>
+                <a href="/" class="btn btn-outline" style="padding: 15px 30px; background: white; color: #3498db; border: 2px solid #3498db;">
+                    <i class="fas fa-home"></i> Về Trang Chủ
+                </a>
+            </div>
+            
+            <!-- Support -->
+            <div style="margin-top: 3rem; padding: 1.5rem; background: #fff3cd; border-radius: 10px; animation: fadeInUp 0.6s 0.5s backwards;">
+                <i class="fas fa-headset" style="font-size: 2rem; color: #856404; margin-bottom: 0.5rem;"></i>
+                <div style="color: #856404;">
+                    <strong>Cần hỗ trợ?</strong><br>
+                    Hotline: <strong>1900-xxxx</strong> | Email: <strong>contact@noithat.vn</strong>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</section>
+
+<style>
+@keyframes scaleIn {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>
+
+{% endblock %}

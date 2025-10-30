@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% block title %}Đăng Nhập - Nội Thất ABC{% endblock %}
+
+{% block head %}
+  {{ super() }}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    /* ===== Reset & Layout ===== */
+    .auth-container *, .auth-container *::before, .auth-container *::after { box-sizing: border-box; }
+    .auth-container h1, .auth-container h2, .auth-container h3, .auth-container p { margin: 0; }
+
+    .auth-container{
+      min-height: calc(100vh - 120px);
+      display:grid; place-items:center;
+      padding: clamp(20px, 3.2vw, 48px);
+      background:#f6f8fb;
+    }
+    .auth-box{
+      width:min(520px, 100%);
+      background:#fff;
+      border:1px solid rgba(2,6,23,.06);
+      border-radius:16px;
+      box-shadow:0 12px 28px rgba(2,6,23,.08);
+      padding: clamp(24px, 3vw, 36px);
+    }
+
+    /* ===== Heading ===== */
+    .auth-title{
+      display:flex; align-items:center; gap:10px;
+      font-weight:800; font-size: clamp(22px, 2.6vw, 28px);
+      color:#1f2a37; letter-spacing:.2px; margin-bottom:6px;
+    }
+    .auth-sub{ color:#6b7280; margin-bottom:18px; }
+
+    /* ===== Alerts (flash) ===== */
+    .alert{ display:flex; gap:10px; align-items:flex-start; padding:12px 14px;
+      border-radius:12px; margin:10px 0 16px; border:1px solid transparent; font-weight:600; }
+    .alert i{ margin-top:2px }
+    .alert-success{ background:#ecfdf5; color:#065f46; border-color:#a7f3d0 }
+    .alert-danger{  background:#fef2f2; color:#7f1d1d; border-color:#fecaca }
+    .alert-warning{ background:#fffbeb; color:#7c2d12; border-color:#fde68a }
+    .alert-info{    background:#eff6ff; color:#1e3a8a; border-color:#bfdbfe }
+
+    /* ===== Form ===== */
+    form{ margin-top:6px }
+    .form-group{ margin-bottom:16px; }
+    .form-group label{
+      display:block; font-weight:700; color:#1f2a37;
+      margin-bottom:8px; letter-spacing:.2px;
+    }
+    .form-group label i{ color:#64748b; width:18px; margin-right:6px }
+
+    .input-wrap{ position:relative }
+    .form-control{
+      width:100%; display:block;
+      padding:12px 14px;
+      border-radius:12px; border:1px solid #e5e7eb; background:#fff;
+      color:#111827; font:inherit; line-height:1.5;
+      transition: border-color .15s ease, box-shadow .15s ease;
+    }
+    .form-control::placeholder{ color:#9ca3af }
+    .form-control:focus{
+      outline:0; border-color:#2563eb; box-shadow:0 0 0 4px rgba(37,99,235,.15);
+    }
+
+    /* Toggle eye */
+    .btn-eye{
+      position:absolute; right:8px; top:50%; transform:translateY(-50%);
+      border:0; background:transparent; color:#64748b;
+      cursor:pointer; padding:6px 8px;
+    }
+
+    /* Row phụ: nhớ tôi + quên mật khẩu */
+    .auth-row{
+      display:flex; align-items:center; justify-content:space-between; gap:10px; margin:8px 0 16px;
+    }
+    .remember{
+      display:inline-flex; align-items:center; gap:8px; color:#374151; font-weight:600;
+    }
+    .remember input{ width:18px; height:18px; accent-color:#2563eb; }
+
+    /* ===== Button ===== */
+    .btn{
+      width:100%; display:inline-flex; align-items:center; justify-content:center; gap:10px;
+      padding:14px 16px; border-radius:12px; border:1px solid transparent;
+      font-weight:800; letter-spacing:.2px; cursor:pointer;
+      color:#fff; background:#2563eb;
+      box-shadow:0 12px 24px rgba(37,99,235,.18);
+      transition: filter .15s ease, transform .08s ease;
+    }
+    .btn:hover{ filter:brightness(.96) }
+    .btn:active{ transform: translateY(0) }
+
+    /* Links */
+    .muted-link{ color:#2563eb; font-weight:700; text-decoration:none }
+    .muted-link:hover{ text-decoration:underline }
+    .auth-links{ margin-top:18px; text-align:center; color:#6b7280 }
+
+    /* Dark mode hệ thống */
+    @media (prefers-color-scheme: dark){
+      .auth-container{ background:#0b1220 }
+      .auth-box{ background:#0f172a; border-color:#1f2937 }
+      .auth-title{ color:#e5e7eb } .auth-sub{ color:#94a3b8 }
+      .form-group label{ color:#e5e7eb }
+      .form-control{ background:#0b1220; border-color:#1f2937; color:#e5e7eb }
+      .form-control::placeholder{ color:#64748b }
+      .auth-links{ color:#94a3b8 } .muted-link{ color:#93c5fd }
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+  <div class="auth-box">
+    <h2 class="auth-title"><i class="fa-solid fa-right-to-bracket"></i> Đăng Nhập</h2>
+    <p class="auth-sub">Đăng nhập để quản lý tài khoản & theo dõi đơn hàng của bạn.</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">
+            <i class="fas fa-{{ 'check-circle' if category == 'success' else ('exclamation-triangle' if category == 'warning' else ('circle-info' if category == 'info' else 'exclamation-circle')) }}"></i>
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('customer_login') }}" novalidate>
+      <div class="form-group">
+        <label for="email"><i class="fas fa-envelope"></i> Email</label>
+        <div class="input-wrap">
+          <input class="form-control" type="email" id="email" name="email" required placeholder="Nhập email của bạn" autocomplete="username">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password"><i class="fas fa-lock"></i> Mật khẩu</label>
+        <div class="input-wrap">
+          <input class="form-control" type="password" id="password" name="password" required placeholder="Nhập mật khẩu" autocomplete="current-password">
+          <button class="btn-eye" type="button" aria-label="Hiện/ẩn mật khẩu" data-target="password"><i class="fa-regular fa-eye"></i></button>
+        </div>
+      </div>
+
+      <div class="auth-row">
+        <label class="remember" for="remember">
+          <input type="checkbox" id="remember" name="remember"> Nhớ tôi
+        </label>
+
+        {# Không dùng globals() để tránh lỗi Jinja. Đặt # tạm thời để giữ nguyên chức năng hiện tại. #}
+        <a class="muted-link" href="#">Quên mật khẩu?</a>
+      </div>
+
+      <button type="submit" class="btn">
+        <i class="fas fa-sign-in-alt"></i> Đăng Nhập
+      </button>
+    </form>
+
+    <div class="auth-links">
+      <p>Chưa có tài khoản? <a class="muted-link" href="{{ url_for('customer_register') }}">Đăng ký ngay</a></p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  <script>
+    // Toggle show/hide password (UI only, không đụng logic)
+    document.querySelectorAll('.btn-eye').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const id = btn.getAttribute('data-target');
+        const input = document.getElementById(id);
+        const icon = btn.querySelector('i');
+        if(input.type === 'password'){ input.type='text'; icon.classList.replace('fa-eye','fa-eye-slash'); }
+        else { input.type='password'; icon.classList.replace('fa-eye-slash','fa-eye'); }
+      });
+    });
+  </script>
+{% endblock %}

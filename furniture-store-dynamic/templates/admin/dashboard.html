@@ -1,0 +1,103 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>📊 Dashboard</h1>
+    <p>Tổng quan hệ thống</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <h3>Tổng Sản Phẩm</h3>
+        <div class="stat-value">{{ stats.total_products }}</div>
+    </div>
+
+    <div class="stat-card">
+        <h3>Tổng Đơn Hàng</h3>
+        <div class="stat-value">{{ stats.total_orders }}</div>
+    </div>
+
+    <div class="stat-card">
+        <h3>Tổng Doanh Thu</h3>
+        <div class="stat-value">
+            {% if stats.revenue and stats.revenue.total_revenue %}
+                {{ "{:,.0f}".format(stats.revenue.total_revenue) }} ₫
+            {% else %}
+                0 ₫
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <h3>Giá Trị Đơn TB</h3>
+        <div class="stat-value">
+            {% if stats.revenue and stats.revenue.avg_order_value %}
+                {{ "{:,.0f}".format(stats.revenue.avg_order_value) }} ₫
+            {% else %}
+                0 ₫
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3>🛒 Đơn Hàng Gần Đây</h3>
+    </div>
+
+    {% if recent_orders %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Mã Đơn</th>
+                <th>Khách Hàng</th>
+                <th>Tổng Tiền</th>
+                <th>Trạng Thái</th>
+                <th>Thanh Toán</th>
+                <th>Ngày Đặt</th>
+                <th>Thao Tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in recent_orders %}
+            <tr>
+                <td><strong>{{ order.order_id }}</strong></td>
+                <td>{{ order.customer_name }}</td>
+                <td>{{ "{:,.0f}".format(order.total) }} ₫</td>
+                <td>
+                    {% if order.status == 'pending' %}
+                        <span style="color: #f39c12;">⏳ Chờ xử lý</span>
+                    {% elif order.status == 'confirmed' %}
+                        <span style="color: #3498db;">✓ Đã xác nhận</span>
+                    {% elif order.status == 'shipping' %}
+                        <span style="color: #9b59b6;">🚚 Đang giao</span>
+                    {% elif order.status == 'completed' %}
+                        <span style="color: #27ae60;">✓ Hoàn thành</span>
+                    {% else %}
+                        <span style="color: #e74c3c;">✗ {{ order.status }}</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if order.payment_status == 'pending' %}
+                        <span style="color: #f39c12;">Chưa thanh toán</span>
+                    {% elif order.payment_status == 'paid' %}
+                        <span style="color: #27ae60;">Đã thanh toán</span>
+                    {% else %}
+                        {{ order.payment_status }}
+                    {% endif %}
+                </td>
+                <td>{{ order.created_at.strftime('%d/%m/%Y %H:%M') if order.created_at else 'N/A' }}</td>
+                <td>
+                    <a href="{{ url_for('admin_order_detail', order_id=order.order_id) }}" class="btn btn-primary" style="padding: 5px 10px; font-size: 12px;">Xem</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="text-align: center; color: #7f8c8d; padding: 20px;">Chưa có đơn hàng nào</p>
+    {% endif %}
+</div>
+{% endblock %}

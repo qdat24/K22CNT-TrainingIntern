@@ -1,0 +1,748 @@
+{% extends "base.html" %}
+
+{% block title %}Trang Chủ - Nội Thất Sang Trọng{% endblock %}
+
+{% block content %}
+<style>
+/* CSS bổ sung cho index page - tương thích với CSS hiện có */
+.hero-modern {
+    background: linear-gradient(135deg, rgba(44, 62, 80, 0.95) 0%, rgba(52, 152, 219, 0.95) 100%), 
+                url('https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1920') center/cover;
+    color: white;
+    padding: 120px 0;
+    text-align: center;
+}
+
+.hero-modern h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.hero-modern p {
+    font-size: 1.3rem;
+    margin-bottom: 2.5rem;
+    opacity: 0.95;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* Search Bar */
+.search-section {
+    background: white;
+    padding: 2rem 0;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+}
+
+.search-wrapper {
+    display: flex;
+    gap: 1rem;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.search-box-new {
+    flex: 2;
+    position: relative;
+}
+
+.search-box-new i {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-light);
+}
+
+.search-box-new input {
+    width: 100%;
+    padding: 15px 20px 15px 50px;
+    border: 2px solid var(--border-color);
+    border-radius: 50px;
+    font-size: 1rem;
+}
+
+.search-box-new input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.filter-select-new {
+    flex: 1;
+    padding: 15px 20px;
+    border: 2px solid var(--border-color);
+    border-radius: 50px;
+    font-size: 1rem;
+    cursor: pointer;
+    background: white;
+}
+
+/* Categories Grid */
+.categories-modern {
+    padding: 80px 0;
+    background: var(--bg-light);
+}
+
+.cat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.cat-item {
+    background: white;
+    padding: 2.5rem 1.5rem;
+    border-radius: 15px;
+    text-align: center;
+    transition: all 0.3s;
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--text-dark);
+}
+
+.cat-item:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+}
+
+.cat-icon {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 1rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: white;
+}
+
+.cat-item:hover .cat-icon {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.cat-item h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.cat-item p {
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+/* Features Bar */
+.features-bar {
+    padding: 30px 0;
+    background: white;
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.features-flex {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 2rem;
+}
+
+.feat-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.feat-icon {
+    width: 50px;
+    height: 50px;
+    background: var(--bg-light);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--primary-color);
+}
+
+.feat-text h4 {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+}
+
+.feat-text p {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin: 0;
+}
+
+/* Products Enhanced */
+.products-enhanced {
+    padding: 80px 0;
+}
+
+.section-head {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.section-head h2 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.section-head p {
+    color: var(--text-light);
+    font-size: 1.1rem;
+}
+
+.products-grid-new {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.product-new {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: 1px solid var(--border-color);
+}
+
+.product-new:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+}
+
+.prod-img-wrap {
+    position: relative;
+    padding-top: 100%;
+    background: var(--bg-light);
+    overflow: hidden;
+}
+
+.prod-img-wrap img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s;
+}
+
+.product-new:hover .prod-img-wrap img {
+    transform: scale(1.08);
+}
+
+.disc-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #ff4757;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.prod-details {
+    padding: 1.5rem;
+}
+
+.prod-cat {
+    display: inline-block;
+    padding: 0.3rem 0.8rem;
+    background: var(--bg-light);
+    color: var(--text-light);
+    border-radius: 15px;
+    font-size: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.prod-name {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-dark);
+}
+
+.prod-rating {
+    color: #ffa500;
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+}
+
+.prod-rating .review-cnt {
+    color: var(--text-light);
+    font-size: 0.85rem;
+}
+
+.prod-price-new {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.price-current {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #ff4757;
+}
+
+.price-old {
+    font-size: 1rem;
+    color: var(--text-light);
+    text-decoration: line-through;
+}
+
+/* Promo Boxes */
+.promo-section {
+    padding: 60px 0;
+    background: var(--bg-light);
+}
+
+.promo-grid-new {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.promo-box {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    padding: 3rem;
+    color: white;
+    text-align: center;
+}
+
+.promo-box h3 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+}
+
+.promo-box p {
+    margin-bottom: 1.5rem;
+    opacity: 0.95;
+}
+
+.promo-box.orange {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.promo-box.blue {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+/* Testimonials */
+.testimonials {
+    padding: 80px 0;
+}
+
+.testimonial-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.testi-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+}
+
+.testi-stars {
+    color: #ffa500;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+.testi-text {
+    font-style: italic;
+    margin-bottom: 1.5rem;
+    line-height: 1.7;
+}
+
+.testi-author {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.testi-author img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+}
+
+.testi-author strong {
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.testi-author span {
+    font-size: 0.85rem;
+    color: var(--text-light);
+}
+
+/* CTA Section */
+.cta-section {
+    padding: 80px 0;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+    color: white;
+    text-align: center;
+}
+
+.cta-section h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.cta-section p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    opacity: 0.95;
+}
+
+/* Utility Classes */
+.btn-white {
+    background: white;
+    color: var(--primary-color);
+}
+
+.btn-white:hover {
+    background: var(--bg-light);
+}
+
+.btn-outline-white {
+    background: transparent;
+    border: 2px solid white;
+    color: white;
+}
+
+.btn-outline-white:hover {
+    background: white;
+    color: var(--primary-color);
+}
+
+.text-center {
+    text-align: center;
+}
+
+.mt-3 {
+    margin-top: 3rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hero-modern h1 {
+        font-size: 2rem;
+    }
+    
+    .hero-modern p {
+        font-size: 1rem;
+    }
+    
+    .search-wrapper {
+        flex-direction: column;
+    }
+    
+    .cat-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .products-grid-new {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .cat-grid,
+    .products-grid-new {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<!-- Hero Section -->
+<section class="hero-modern">
+    <div class="container">
+        <h1>Nội Thất Sang Trọng Cho Ngôi Nhà Của Bạn</h1>
+        <p>Khám phá bộ sưu tập nội thất hiện đại, chất lượng cao với giá tốt nhất</p>
+        <div class="hero-buttons">
+            <a href="/products" class="btn" style="background: var(--secondary-color); color: white;">Khám Phá Ngay</a>
+            <a href="#categories" class="btn btn-outline-white">Danh Mục</a>
+        </div>
+    </div>
+</section>
+
+<!-- Search & Filter Bar -->
+<section class="search-section">
+    <div class="container">
+        <div class="search-wrapper">
+            <div class="search-box-new">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Tìm kiếm sản phẩm..." onkeypress="if(event.key==='Enter') window.location.href='/products?search='+this.value">
+            </div>
+            <select class="filter-select-new" onchange="if(this.value) window.location.href='/products?category='+this.value">
+                <option value="">Tất cả danh mục</option>
+                <option value="Phòng Khách">Phòng Khách</option>
+                <option value="Phòng Ngủ">Phòng Ngủ</option>
+                <option value="Nhà Bếp">Nhà Bếp</option>
+                <option value="Văn Phòng">Văn Phòng</option>
+                <option value="Phòng Ăn">Phòng Ăn</option>
+            </select>
+            <select class="filter-select-new" onchange="if(this.value) window.location.href='/products?price='+this.value">
+                <option value="">Mức giá</option>
+                <option value="0-5000000">Dưới 5 triệu</option>
+                <option value="5000000-10000000">5 - 10 triệu</option>
+                <option value="10000000-20000000">10 - 20 triệu</option>
+                <option value="20000000-999999999">Trên 20 triệu</option>
+            </select>
+        </div>
+    </div>
+</section>
+
+<!-- Categories -->
+<section class="categories-modern" id="categories">
+    <div class="container">
+        <div class="section-head">
+            <h2>Danh Mục Sản Phẩm</h2>
+            <p>Lựa chọn theo phòng và phong cách</p>
+        </div>
+        <div class="cat-grid">
+            <a href="/products?category=Phòng%20Khách" class="cat-item">
+                <div class="cat-icon"><i class="fas fa-couch"></i></div>
+                <h3>Phòng Khách</h3>
+                <p>Sofa, bàn trà, kệ</p>
+            </a>
+            <a href="/products?category=Phòng%20Ngủ" class="cat-item">
+                <div class="cat-icon"><i class="fas fa-bed"></i></div>
+                <h3>Phòng Ngủ</h3>
+                <p>Giường, tủ quần áo</p>
+            </a>
+            <a href="/products?category=Nhà%20Bếp" class="cat-item">
+                <div class="cat-icon"><i class="fas fa-utensils"></i></div>
+                <h3>Nhà Bếp</h3>
+                <p>Tủ bếp, bàn đảo</p>
+            </a>
+            <a href="/products?category=Văn%20Phòng" class="cat-item">
+                <div class="cat-icon"><i class="fas fa-briefcase"></i></div>
+                <h3>Văn Phòng</h3>
+                <p>Bàn, ghế làm việc</p>
+            </a>
+            <a href="/products?category=Phòng%20Ăn" class="cat-item">
+                <div class="cat-icon"><i class="fas fa-chair"></i></div>
+                <h3>Phòng Ăn</h3>
+                <p>Bàn ăn, ghế ăn</p>
+            </a>
+            <a href="/products" class="cat-item">
+                <div class="cat-icon"><i class="fas fa-th"></i></div>
+                <h3>Tất Cả</h3>
+                <p>Xem toàn bộ</p>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Features Bar -->
+<section class="features-bar">
+    <div class="container">
+        <div class="features-flex">
+            <div class="feat-item">
+                <div class="feat-icon"><i class="fas fa-shipping-fast"></i></div>
+                <div class="feat-text">
+                    <h4>Miễn Phí Vận Chuyển</h4>
+                    <p>Đơn hàng từ 5 triệu</p>
+                </div>
+            </div>
+            <div class="feat-item">
+                <div class="feat-icon"><i class="fas fa-undo"></i></div>
+                <div class="feat-text">
+                    <h4>Đổi Trả 30 Ngày</h4>
+                    <p>Hoàn tiền 100%</p>
+                </div>
+            </div>
+            <div class="feat-item">
+                <div class="feat-icon"><i class="fas fa-shield-alt"></i></div>
+                <div class="feat-text">
+                    <h4>Bảo Hành Chính Hãng</h4>
+                    <p>Từ 1-3 năm</p>
+                </div>
+            </div>
+            <div class="feat-item">
+                <div class="feat-icon"><i class="fas fa-headset"></i></div>
+                <div class="feat-text">
+                    <h4>Hỗ Trợ 24/7</h4>
+                    <p>Tư vấn nhiệt tình</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Products -->
+<section class="products-enhanced">
+    <div class="container">
+        <div class="section-head">
+            <h2>Sản Phẩm Nổi Bật</h2>
+            <p>Được khách hàng yêu thích nhất</p>
+        </div>
+        <div class="products-grid-new">
+            {% for product in featured_products[:12] %}
+            <div class="product-new" onclick="window.location.href='/product/{{ product.id }}'">
+                <div class="prod-img-wrap">
+                    <img src="{{ product.image }}" alt="{{ product.name }}">
+                    {% if product.original_price > product.price %}
+                    <div class="disc-badge">
+                        -{{ ((product.original_price - product.price) / product.original_price * 100) | int }}%
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="prod-details">
+                    <span class="prod-cat">{{ product.category }}</span>
+                    <h3 class="prod-name">{{ product.name }}</h3>
+                    <div class="prod-rating">
+                        {% for i in range(5) %}
+                            {% if i < product.rating %}
+                                <i class="fas fa-star"></i>
+                            {% else %}
+                                <i class="far fa-star"></i>
+                            {% endif %}
+                        {% endfor %}
+                        <span class="review-cnt">({{ product.reviews }})</span>
+                    </div>
+                    <div class="prod-price-new">
+                        <span class="price-current">{{ product.price | format_currency }}</span>
+                        {% if product.original_price > product.price %}
+                        <span class="price-old">{{ product.original_price | format_currency }}</span>
+                        {% endif %}
+                    </div>
+                    <button class="btn" onclick="event.stopPropagation(); addToCart({{ product.id }})" style="width: 100%; background: var(--primary-color); color: white;">
+                        <i class="fas fa-shopping-cart"></i> Thêm Vào Giỏ
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-3">
+            <a href="/products" class="btn" style="background: var(--primary-color); color: white; padding: 1rem 3rem; font-size: 1.1rem;">
+                Xem Tất Cả Sản Phẩm <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Promotional Boxes -->
+<section class="promo-section">
+    <div class="container">
+        <div class="promo-grid-new">
+            <div class="promo-box">
+                <h3>🎉 Bộ Sưu Tập Mới</h3>
+                <p>Giảm giá lên đến 35% cho toàn bộ sản phẩm mới ra mắt</p>
+                <a href="/products" class="btn btn-white">Khám Phá Ngay</a>
+            </div>
+            <div class="promo-box orange">
+                <h3>🚚 Freeship 0Đ</h3>
+                <p>Miễn phí vận chuyển toàn quốc cho mọi đơn hàng</p>
+                <a href="/products" class="btn btn-white">Mua Ngay</a>
+            </div>
+            <div class="promo-box blue">
+                <h3>🎨 Thiết Kế Miễn Phí</h3>
+                <p>Tư vấn thiết kế 3D không gian nội thất</p>
+                <a href="/contact" class="btn btn-white">Đăng Ký</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials -->
+<section class="testimonials">
+    <div class="container">
+        <div class="section-head">
+            <h2>Khách Hàng Nói Gì</h2>
+            <p>Đánh giá từ hàng nghìn khách hàng hài lòng</p>
+        </div>
+        <div class="testimonial-grid">
+            <div class="testi-card">
+                <div class="testi-stars">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+                <p class="testi-text">"Sản phẩm chất lượng tuyệt vời, giao hàng nhanh chóng và đóng gói cẩn thận. Nhân viên tư vấn rất nhiệt tình!"</p>
+                <div class="testi-author">
+                    <img src="https://i.pravatar.cc/100?img=1" alt="Customer">
+                    <div>
+                        <strong>Nguyễn Văn An</strong>
+                        <span>Đã mua 3 sản phẩm</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="testi-card">
+                <div class="testi-stars">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+                <p class="testi-text">"Thiết kế đẹp, chất liệu tốt, giá cả hợp lý. Đội ngũ lắp đặt chuyên nghiệp. Rất đáng để đầu tư!"</p>
+                <div class="testi-author">
+                    <img src="https://i.pravatar.cc/100?img=5" alt="Customer">
+                    <div>
+                        <strong>Trần Thị Bích</strong>
+                        <span>Khách hàng thân thiết</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="testi-card">
+                <div class="testi-stars">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+                <p class="testi-text">"Mua sofa ở đây được 6 tháng rồi, chất lượng vẫn như mới. Bảo hành chu đáo, rất uy tín!"</p>
+                <div class="testi-author">
+                    <img src="https://i.pravatar.cc/100?img=12" alt="Customer">
+                    <div>
+                        <strong>Lê Minh Châu</strong>
+                        <span>Đã mua 5 sản phẩm</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="cta-section">
+    <div class="container">
+        <h2>Tư Vấn Miễn Phí Thiết Kế Nội Thất</h2>
+        <p>Đội ngũ chuyên gia của chúng tôi sẵn sàng tư vấn và thiết kế không gian hoàn hảo cho bạn</p>
+        <a href="/contact" class="btn btn-white" style="padding: 1rem 3rem; font-size: 1.1rem;">
+            <i class="fas fa-phone-alt"></i> Liên Hệ Ngay
+        </a>
+    </div>
+</section>
+
+{% endblock %}

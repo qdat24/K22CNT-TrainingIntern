@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Nội Thất Sang Trọng{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="container">
+            <div>📞 Hotline: 1900-xxxx | 📧 Email: contact@noithat.vn</div>
+            <div>🚚 Miễn phí vận chuyển cho đơn hàng trên 5 triệu</div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="container">
+                <a href="/" class="logo">
+                    <i class="fas fa-couch"></i>
+                    Nội Thất Sang
+                </a>
+                <ul class="nav-links">
+                    <li><a href="/">Trang Chủ</a></li>
+                    <li class="dropdown">
+                        <a href="/products" class="dropbtn">
+                            Sản Phẩm <i class="fas fa-chevron-down"></i>
+                        </a>
+                        <div class="dropdown-content">
+                            <a href="/products">
+                                <i class="fas fa-th"></i> Tất Cả Sản Phẩm
+                            </a>
+                            <a href="/products?category=Phòng%20Khách">
+                                <i class="fas fa-couch"></i> Phòng Khách
+                            </a>
+                            <a href="/products?category=Phòng%20Ngủ">
+                                <i class="fas fa-bed"></i> Phòng Ngủ
+                            </a>
+                            <a href="/products?category=Nhà%20Bếp">
+                                <i class="fas fa-utensils"></i> Nhà Bếp
+                            </a>
+                            <a href="/products?category=Văn%20Phòng">
+                                <i class="fas fa-briefcase"></i> Văn Phòng
+                            </a>
+                            <a href="/products?category=Phòng%20Ăn">
+                                <i class="fas fa-chair"></i> Phòng Ăn
+                            </a>
+                        </div>
+                    </li>
+                    <li><a href="/about">Về Chúng Tôi</a></li>
+                    <li><a href="/policy">Chính Sách</a></li>
+                    <li><a href="/contact">Liên Hệ</a></li>
+                    <li>
+                        <a href="/cart" class="cart-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="cart-count" id="cartBadge">{{ cart_count }}</span>
+                        </a>
+                    </li>
+                    {% if session.get('customer_logged_in') %}
+                    <li class="dropdown">
+                        <a href="#" class="dropbtn">
+                            <i class="fas fa-user-circle"></i> {{ session.get('customer_name') }}
+                        </a>
+                        <div class="dropdown-content">
+                            <a href="/account">
+                                <i class="fas fa-user"></i> Tài Khoản
+                            </a>
+                            <a href="/logout">
+                                <i class="fas fa-sign-out-alt"></i> Đăng Xuất
+                            </a>
+                        </div>
+                    </li>
+                    {% else %}
+                    <li class="dropdown">
+                        <a href="#" class="dropbtn">
+                            <i class="fas fa-user"></i> Tài Khoản <i class="fas fa-chevron-down"></i>
+                        </a>
+                        <div class="dropdown-content">
+                            <a href="/login">
+                                <i class="fas fa-sign-in-alt"></i> Đăng Nhập
+                            </a>
+                            <a href="/register">
+                                <i class="fas fa-user-plus"></i> Đăng Ký
+                            </a>
+                        </div>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    {% block content %}{% endblock %}
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Về Chúng Tôi</h3>
+                    <p>Nội Thất Sang là đơn vị chuyên cung cấp các sản phẩm nội thất cao cấp, hiện đại với chất lượng tốt nhất.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Liên Kết</h3>
+                    <ul>
+                        <li><a href="/products">Sản Phẩm</a></li>
+                        <li><a href="/about">Về Chúng Tôi</a></li>
+                        <li><a href="/policy">Chính Sách</a></li>
+                        <li><a href="/contact">Liên Hệ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Hỗ Trợ</h3>
+                    <ul>
+                        <li><a href="/guide">Hướng Dẫn Mua Hàng</a></li>
+                        <li><a href="/return-policy">Chính Sách Đổi Trả</a></li>
+                        <li><a href="/warranty">Bảo Hành</a></li>
+                        <li><a href="/faq">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Liên Hệ</h3>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Đường ABC, Quận XYZ, TP.HCM</li>
+                        <li><i class="fas fa-phone"></i> 1900-xxxx</li>
+                        <li><i class="fas fa-envelope"></i> contact@noithat.vn</li>
+                    </ul>
+                    <div style="margin-top: 1rem; font-size: 1.5rem;">
+                        <a href="#" style="margin-right: 1rem;"><i class="fab fa-facebook"></i></a>
+                        <a href="#" style="margin-right: 1rem;"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Nội Thất Sang. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

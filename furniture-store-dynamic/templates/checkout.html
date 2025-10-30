@@ -1,0 +1,274 @@
+{% extends "base.html" %}
+
+{% block title %}Thanh Toán - Nội Thất Sang Trọng{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section style="background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); color: white; padding: 40px 0; text-align: center;">
+    <div class="container">
+        <h1 style="font-size: 2rem; margin-bottom: 0.5rem;">
+            <i class="fas fa-credit-card"></i> Thanh Toán
+        </h1>
+        <p>Hoàn tất đơn hàng của bạn</p>
+    </div>
+</section>
+
+<!-- Checkout Section -->
+<section class="cart-section">
+    <div class="container">
+        <div style="display: grid; grid-template-columns: 1fr 400px; gap: 3rem; align-items: start;">
+            
+            <!-- Checkout Form -->
+            <div>
+                <form id="checkoutForm" onsubmit="submitOrder(event)">
+                    
+                    <!-- Thông tin giao hàng -->
+                    <div style="background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+                        <h2 style="color: #2c3e50; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-shipping-fast"></i> Thông Tin Giao Hàng
+                        </h2>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                            <div>
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Họ và tên <span style="color: red;">*</span></label>
+                                <input type="text" name="fullname" required 
+                                       value="{% if customer %}{{ customer.full_name }}{% endif %}"
+                                       style="width: 100%; padding: 12px; border: 1px solid #e0e0e0; border-radius: 5px; font-size: 1rem;"
+                                       placeholder="Nguyễn Văn A">
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Số điện thoại <span style="color: red;">*</span></label>
+                                <input type="tel" name="phone" required pattern="[0-9]{10,11}"
+                                       value="{% if customer %}{{ customer.phone }}{% endif %}"
+                                       style="width: 100%; padding: 12px; border: 1px solid #e0e0e0; border-radius: 5px; font-size: 1rem;"
+                                       placeholder="0912345678">
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Email <span style="color: red;">*</span></label>
+                            <input type="email" name="email" required
+                                   value="{% if customer %}{{ customer.email }}{% endif %}"
+                                   style="width: 100%; padding: 12px; border: 1px solid #e0e0e0; border-radius: 5px; font-size: 1rem;"
+                                   placeholder="example@email.com">
+                        </div>
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Địa chỉ giao hàng <span style="color: red;">*</span></label>
+                            <input type="text" name="address" required
+                                   value="{% if customer %}{{ customer.address }}{% endif %}"
+                                   style="width: 100%; padding: 12px; border: 1px solid #e0e0e0; border-radius: 5px; font-size: 1rem;"
+                                   placeholder="Số nhà, tên đường">
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+                            <div>
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Tỉnh/Thành phố <span style="color: red;">*</span></label>
+                                <select name="city" required
+                                        style="width: 100%; padding: 12px; border: 1px solid #e0e0e0; border-radius: 5px; font-size: 1rem;">
+                                    <option value="">Chọn tỉnh/thành</option>
+                                    <option value="Hà Nội">Hà Nội</option>
+                                    <option value="TP. Hồ Chí Minh">TP. Hồ Chí Minh</option>
+                                    <option value="Đà Nẵng">Đà Nẵng</option>
+                                    <option value="Hải Phòng">Hải Phòng</option>
+                                    <option value="Cần Thơ">Cần Thơ</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Quận/Huyện <span style="color: red;">*</span></label>
+                                <input type="text" name="district" required
+                                       style="width: 100%; padding: 12px; border: 1px solid #e0e0e0; border-radius: 5px; font-size: 1rem;"
+                                       placeholder="Quận/Huyện">
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Phường/Xã <span style="color: red;">*</span></label>
+                                <input type="text" name="ward" required
+                                       style="width: 100%; padding: 12px; border: 1px solid #e0e0e0; border-radius: 5px; font-size: 1rem;"
+                                       placeholder="Phường/Xã">
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Ghi chú (tùy chọn)</label>
+                            <textarea name="note" rows="3"
+                                      style="width: 100%; padding: 12px; border: 1px solid #e0e0e0; border-radius: 5px; font-size: 1rem; resize: vertical;"
+                                      placeholder="Ghi chú về đơn hàng, ví dụ: giao giờ hành chính..."></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- Phương thức thanh toán -->
+                    <div style="background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                        <h2 style="color: #2c3e50; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-wallet"></i> Phương Thức Thanh Toán
+                        </h2>
+                        
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            <label style="display: flex; align-items: center; padding: 1rem; border: 2px solid #e0e0e0; border-radius: 10px; cursor: pointer; transition: all 0.3s;"
+                                   onmouseover="this.style.borderColor='#3498db'" 
+                                   onmouseout="if(!this.querySelector('input').checked) this.style.borderColor='#e0e0e0'">
+                                <input type="radio" name="payment_method" value="cod" checked
+                                       style="margin-right: 1rem; width: 20px; height: 20px; cursor: pointer;"
+                                       onchange="document.querySelectorAll('label').forEach(l => l.style.borderColor='#e0e0e0'); this.parentElement.style.borderColor='#3498db';">
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 600; font-size: 1.1rem; margin-bottom: 0.3rem;">
+                                        <i class="fas fa-money-bill-wave" style="color: #27ae60;"></i> Thanh toán khi nhận hàng (COD)
+                                    </div>
+                                    <div style="color: #7f8c8d; font-size: 0.9rem;">Thanh toán bằng tiền mặt khi nhận hàng</div>
+                                </div>
+                            </label>
+                            
+                            <label style="display: flex; align-items: center; padding: 1rem; border: 2px solid #e0e0e0; border-radius: 10px; cursor: pointer; transition: all 0.3s;"
+                                   onmouseover="this.style.borderColor='#3498db'" 
+                                   onmouseout="if(!this.querySelector('input').checked) this.style.borderColor='#e0e0e0'">
+                                <input type="radio" name="payment_method" value="bank_transfer"
+                                       style="margin-right: 1rem; width: 20px; height: 20px; cursor: pointer;"
+                                       onchange="document.querySelectorAll('label').forEach(l => l.style.borderColor='#e0e0e0'); this.parentElement.style.borderColor='#3498db';">
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 600; font-size: 1.1rem; margin-bottom: 0.3rem;">
+                                        <i class="fas fa-university" style="color: #3498db;"></i> Chuyển khoản ngân hàng
+                                    </div>
+                                    <div style="color: #7f8c8d; font-size: 0.9rem;">Chuyển khoản qua ngân hàng hoặc ví điện tử</div>
+                                </div>
+                            </label>
+                            
+                            <label style="display: flex; align-items: center; padding: 1rem; border: 2px solid #e0e0e0; border-radius: 10px; cursor: pointer; transition: all 0.3s;"
+                                   onmouseover="this.style.borderColor='#3498db'" 
+                                   onmouseout="if(!this.querySelector('input').checked) this.style.borderColor='#e0e0e0'">
+                                <input type="radio" name="payment_method" value="credit_card"
+                                       style="margin-right: 1rem; width: 20px; height: 20px; cursor: pointer;"
+                                       onchange="document.querySelectorAll('label').forEach(l => l.style.borderColor='#e0e0e0'); this.parentElement.style.borderColor='#3498db';">
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 600; font-size: 1.1rem; margin-bottom: 0.3rem;">
+                                        <i class="fas fa-credit-card" style="color: #e67e22;"></i> Thẻ tín dụng/Ghi nợ
+                                    </div>
+                                    <div style="color: #7f8c8d; font-size: 0.9rem;">Visa, MasterCard, JCB</div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    
+                </form>
+            </div>
+            
+            <!-- Order Summary -->
+            <div style="position: sticky; top: 100px;">
+                <div style="background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                    <h3 style="color: #2c3e50; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-shopping-bag"></i> Đơn Hàng Của Bạn
+                    </h3>
+                    
+                    <!-- Cart Items -->
+                    <div style="max-height: 300px; overflow-y: auto; margin-bottom: 1.5rem;">
+                        {% for item in cart_items %}
+                        <div style="display: flex; gap: 1rem; padding-bottom: 1rem; margin-bottom: 1rem; border-bottom: 1px solid #e0e0e0;">
+                            <img src="{{ item.product.image }}" alt="{{ item.product.name }}" 
+                                 style="width: 60px; height: 60px; object-fit: cover; border-radius: 5px;">
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; margin-bottom: 0.3rem;">{{ item.product.name }}</div>
+                                <div style="color: #7f8c8d; font-size: 0.9rem;">Số lượng: {{ item.quantity }}</div>
+                                <div style="color: #e67e22; font-weight: 600; margin-top: 0.3rem;">
+                                    {{ item.subtotal | format_currency }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Summary -->
+                    <div class="summary-row">
+                        <span>Tạm tính:</span>
+                        <span>{{ subtotal | format_currency }}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Phí vận chuyển:</span>
+                        <span>
+                            {% if subtotal >= 5000000 %}
+                            <span style="color: #27ae60; font-weight: bold;">Miễn phí</span>
+                            {% else %}
+                            {{ shipping_fee | format_currency }}
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="summary-row" style="border-top: 2px solid #ddd; padding-top: 1rem; margin-top: 1rem;">
+                        <span style="font-size: 1.2rem; font-weight: bold;">Tổng cộng:</span>
+                        <span class="summary-total">{{ total | format_currency }}</span>
+                    </div>
+                    
+                    <button type="submit" form="checkoutForm" class="btn" 
+                            style="width: 100%; padding: 15px; font-size: 1.1rem; margin-top: 1.5rem;">
+                        <i class="fas fa-check-circle"></i> Hoàn Tất Đơn Hàng
+                    </button>
+                    
+                    <a href="/cart" style="display: block; text-align: center; margin-top: 1rem; color: #3498db; text-decoration: none;">
+                        <i class="fas fa-arrow-left"></i> Quay lại giỏ hàng
+                    </a>
+                </div>
+                
+                <!-- Security Badge -->
+                <div style="background: #e8f5e9; padding: 1rem; border-radius: 10px; margin-top: 1rem; text-align: center;">
+                    <i class="fas fa-lock" style="color: #27ae60; font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
+                    <div style="font-size: 0.9rem; color: #2e7d32;">
+                        <strong>Thanh toán an toàn & bảo mật</strong>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</section>
+
+<script>
+async function submitOrder(event) {
+    event.preventDefault();
+    
+    const form = event.target;
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+    
+    // Show loading
+    const submitBtn = document.querySelector('button[type="submit"]');
+    if (!submitBtn) {
+        console.error('Submit button not found');
+        alert('Có lỗi xảy ra. Vui lòng tải lại trang!');
+        return;
+    }
+    
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+    submitBtn.disabled = true;
+    
+    try {
+        const response = await fetch('/api/place-order', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            // Redirect based on payment method
+            if (result.redirect === 'bank_transfer') {
+                window.location.href = '/bank-transfer/' + result.order_id;
+            } else if (result.redirect === 'credit_card') {
+                window.location.href = '/credit-card/' + result.order_id;
+            } else {
+                window.location.href = '/order-success?order_id=' + result.order_id;
+            }
+        } else {
+            alert('Có lỗi xảy ra: ' + (result.message || 'Vui lòng thử lại'));
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Có lỗi xảy ra. Vui lòng thử lại!');
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }
+}
+</script>
+
+{% endblock %}

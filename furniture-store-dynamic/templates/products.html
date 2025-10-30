@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Sản Phẩm - Nội Thất Sang Trọng{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section style="background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); color: white; padding: 60px 0; text-align: center;">
+    <div class="container">
+        <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Bộ Sưu Tập Nội Thất</h1>
+        <p style="opacity: 0.9;">Khám phá các sản phẩm nội thất cao cấp, hiện đại</p>
+    </div>
+</section>
+
+<!-- Search & Filter -->
+<section class="search-filter">
+    <div class="container">
+        <div class="filter-container">
+            <div class="search-box">
+                <input type="text" 
+                       class="search-input" 
+                       placeholder="🔍 Tìm kiếm sản phẩm..." 
+                       value="{{ search }}"
+                       onkeypress="if(event.key === 'Enter') window.location.href='/products?search=' + encodeURIComponent(this.value)">
+            </div>
+            <div class="category-filter">
+                {% for category in categories %}
+                <button class="category-btn {% if selected_category == category %}active{% endif %}" 
+                        onclick="filterByCategory('{{ category }}')">
+                    {{ category }}
+                </button>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Products Grid -->
+<section class="products-section">
+    <div class="container">
+        {% if products %}
+        <p style="margin-bottom: 2rem; color: #7f8c8d;">
+            Tìm thấy <strong>{{ products | length }}</strong> sản phẩm
+        </p>
+        <div class="products-grid">
+            {% for product in products %}
+            <div class="product-card" onclick="window.location.href='/product/{{ product.id }}'">
+                <div class="product-image-wrapper">
+                    <img src="{{ product.image }}" alt="{{ product.name }}" class="product-image">
+                    {% if product.original_price > product.price %}
+                    <span class="product-badge">
+                        -{{ ((product.original_price - product.price) / product.original_price * 100) | int }}%
+                    </span>
+                    {% endif %}
+                </div>
+                <div class="product-info">
+                    <div class="product-category">{{ product.category }}</div>
+                    <h3 class="product-name">{{ product.name }}</h3>
+                    <div class="product-rating">
+                        <span class="stars">
+                            {% for i in range(5) %}
+                                {% if i < product.rating %}
+                                    <i class="fas fa-star"></i>
+                                {% else %}
+                                    <i class="far fa-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </span>
+                        <span style="color: #7f8c8d; font-size: 0.9rem;">({{ product.reviews }})</span>
+                    </div>
+                    <div class="product-price">
+                        <span class="price">{{ product.price | format_currency }}</span>
+                        {% if product.original_price > product.price %}
+                        <span class="original-price">{{ product.original_price | format_currency }}</span>
+                        {% endif %}
+                    </div>
+                    <button class="btn" onclick="event.stopPropagation(); addToCart({{ product.id }})" style="width: 100%;">
+                        <i class="fas fa-shopping-cart"></i> Thêm Vào Giỏ
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 60px 0;">
+            <i class="fas fa-search" style="font-size: 4rem; color: #ddd; margin-bottom: 1rem;"></i>
+            <h3 style="color: #7f8c8d;">Không tìm thấy sản phẩm nào</h3>
+            <p style="color: #95a5a6; margin-bottom: 2rem;">Vui lòng thử lại với từ khóa khác</p>
+            <a href="/products" class="btn">Xem Tất Cả Sản Phẩm</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
