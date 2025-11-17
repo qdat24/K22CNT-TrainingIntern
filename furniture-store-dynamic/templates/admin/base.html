@@ -279,6 +279,8 @@
             <li><a href="{{ url_for('admin_dashboard') }}" class="{% if request.endpoint == 'admin_dashboard' %}active{% endif %}">📊 Dashboard</a></li>
             <li><a href="{{ url_for('admin_products') }}" class="{% if 'product' in request.endpoint %}active{% endif %}">📦 Sản Phẩm</a></li>
             <li><a href="{{ url_for('admin_orders') }}" class="{% if 'order' in request.endpoint %}active{% endif %}">🛒 Đơn Hàng</a></li>
+            <li><a href="{{ url_for('admin_customers') }}" class="{% if 'customer' in request.endpoint %}active{% endif %}">👥 Khách Hàng</a></li>
+            <li><a href="{{ url_for('admin_settings') }}" class="{% if request.endpoint == 'admin_settings' %}active{% endif %}">⚙️ Cài Đặt</a></li>
             <li><a href="{{ url_for('index') }}" target="_blank">🌐 Xem Website</a></li>
         </ul>
 

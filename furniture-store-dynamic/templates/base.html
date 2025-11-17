@@ -5,14 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Nội Thất Sang Trọng{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/darkmode.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <!-- Top Bar -->
     <div class="top-bar">
         <div class="container">
-            <div>📞 Hotline: 1900-xxxx | 📧 Email: contact@noithat.vn</div>
-            <div>🚚 Miễn phí vận chuyển cho đơn hàng trên 5 triệu</div>
+            <div>📞 Hotline: {{ site_settings.get('contact_phone', '1900-xxxx') }} | 📧 Email: {{ site_settings.get('contact_email', 'contact@noithat.vn') }}</div>
+            <div data-translate="Miễn phí vận chuyển cho đơn hàng trên 5 triệu">🚚 Miễn phí vận chuyển cho đơn hàng trên 5 triệu</div>
         </div>
     </div>
 
@@ -21,39 +22,43 @@
         <nav class="navbar">
             <div class="container">
                 <a href="/" class="logo">
-                    <i class="fas fa-couch"></i>
-                    Nội Thất Sang
+                    {% if site_settings.get('site_logo') %}
+                        <img src="{{ site_settings.get('site_logo') }}" alt="{{ site_settings.get('site_name', 'Nội Thất Sang') }}" style="height: 40px; vertical-align: middle;">
+                    {% else %}
+                        <i class="fas fa-couch"></i>
+                        {{ site_settings.get('site_name', 'Nội Thất Sang') }}
+                    {% endif %}
                 </a>
                 <ul class="nav-links">
-                    <li><a href="/">Trang Chủ</a></li>
+                    <li><a href="/" data-translate="Trang Chủ">Trang Chủ</a></li>
                     <li class="dropdown">
                         <a href="/products" class="dropbtn">
-                            Sản Phẩm <i class="fas fa-chevron-down"></i>
+                            <span data-translate="Sản Phẩm">Sản Phẩm</span> <i class="fas fa-chevron-down"></i>
                         </a>
                         <div class="dropdown-content">
                             <a href="/products">
-                                <i class="fas fa-th"></i> Tất Cả Sản Phẩm
+                                <i class="fas fa-th"></i> <span data-translate="Tất Cả Sản Phẩm">Tất Cả Sản Phẩm</span>
                             </a>
                             <a href="/products?category=Phòng%20Khách">
-                                <i class="fas fa-couch"></i> Phòng Khách
+                                <i class="fas fa-couch"></i> <span data-translate="Phòng Khách">Phòng Khách</span>
                             </a>
                             <a href="/products?category=Phòng%20Ngủ">
-                                <i class="fas fa-bed"></i> Phòng Ngủ
+                                <i class="fas fa-bed"></i> <span data-translate="Phòng Ngủ">Phòng Ngủ</span>
                             </a>
                             <a href="/products?category=Nhà%20Bếp">
-                                <i class="fas fa-utensils"></i> Nhà Bếp
+                                <i class="fas fa-utensils"></i> <span data-translate="Nhà Bếp">Nhà Bếp</span>
                             </a>
                             <a href="/products?category=Văn%20Phòng">
-                                <i class="fas fa-briefcase"></i> Văn Phòng
+                                <i class="fas fa-briefcase"></i> <span data-translate="Văn Phòng">Văn Phòng</span>
                             </a>
                             <a href="/products?category=Phòng%20Ăn">
-                                <i class="fas fa-chair"></i> Phòng Ăn
+                                <i class="fas fa-chair"></i> <span data-translate="Phòng Ăn">Phòng Ăn</span>
                             </a>
                         </div>
                     </li>
-                    <li><a href="/about">Về Chúng Tôi</a></li>
-                    <li><a href="/policy">Chính Sách</a></li>
-                    <li><a href="/contact">Liên Hệ</a></li>
+                    <li><a href="/about" data-translate="Về Chúng Tôi">Về Chúng Tôi</a></li>
+                    <li><a href="/policy" data-translate="Chính Sách">Chính Sách</a></li>
+                    <li><a href="/contact" data-translate="Liên Hệ">Liên Hệ</a></li>
                     <li>
                         <a href="/cart" class="cart-icon">
                             <i class="fas fa-shopping-cart"></i>
@@ -67,24 +72,24 @@
                         </a>
                         <div class="dropdown-content">
                             <a href="/account">
-                                <i class="fas fa-user"></i> Tài Khoản
+                                <i class="fas fa-user"></i> <span data-translate="Tài Khoản">Tài Khoản</span>
                             </a>
                             <a href="/logout">
-                                <i class="fas fa-sign-out-alt"></i> Đăng Xuất
+                                <i class="fas fa-sign-out-alt"></i> <span data-translate="Đăng Xuất">Đăng Xuất</span>
                             </a>
                         </div>
                     </li>
                     {% else %}
                     <li class="dropdown">
                         <a href="#" class="dropbtn">
-                            <i class="fas fa-user"></i> Tài Khoản <i class="fas fa-chevron-down"></i>
+                            <i class="fas fa-user"></i> <span data-translate="Tài Khoản">Tài Khoản</span> <i class="fas fa-chevron-down"></i>
                         </a>
                         <div class="dropdown-content">
                             <a href="/login">
-                                <i class="fas fa-sign-in-alt"></i> Đăng Nhập
+                                <i class="fas fa-sign-in-alt"></i> <span data-translate="Đăng Nhập">Đăng Nhập</span>
                             </a>
                             <a href="/register">
-                                <i class="fas fa-user-plus"></i> Đăng Ký
+                                <i class="fas fa-user-plus"></i> <span data-translate="Đăng Ký">Đăng Ký</span>
                             </a>
                         </div>
                     </li>
@@ -102,29 +107,29 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
-                    <h3>Về Chúng Tôi</h3>
+                    <h3 data-translate="Về Chúng Tôi">Về Chúng Tôi</h3>
                     <p>Nội Thất Sang là đơn vị chuyên cung cấp các sản phẩm nội thất cao cấp, hiện đại với chất lượng tốt nhất.</p>
                 </div>
                 <div class="footer-section">
-                    <h3>Liên Kết</h3>
+                    <h3 data-translate="Liên Kết">Liên Kết</h3>
                     <ul>
-                        <li><a href="/products">Sản Phẩm</a></li>
-                        <li><a href="/about">Về Chúng Tôi</a></li>
-                        <li><a href="/policy">Chính Sách</a></li>
-                        <li><a href="/contact">Liên Hệ</a></li>
+                        <li><a href="/products" data-translate="Sản Phẩm">Sản Phẩm</a></li>
+                        <li><a href="/about" data-translate="Về Chúng Tôi">Về Chúng Tôi</a></li>
+                        <li><a href="/policy" data-translate="Chính Sách">Chính Sách</a></li>
+                        <li><a href="/contact" data-translate="Liên Hệ">Liên Hệ</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
-                    <h3>Hỗ Trợ</h3>
+                    <h3 data-translate="Hỗ Trợ">Hỗ Trợ</h3>
                     <ul>
-                        <li><a href="/guide">Hướng Dẫn Mua Hàng</a></li>
-                        <li><a href="/return-policy">Chính Sách Đổi Trả</a></li>
-                        <li><a href="/warranty">Bảo Hành</a></li>
+                        <li><a href="/guide" data-translate="Hướng Dẫn Mua Hàng">Hướng Dẫn Mua Hàng</a></li>
+                        <li><a href="/return-policy" data-translate="Chính Sách Đổi Trả">Chính Sách Đổi Trả</a></li>
+                        <li><a href="/warranty" data-translate="Bảo Hành">Bảo Hành</a></li>
                         <li><a href="/faq">FAQ</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
-                    <h3>Liên Hệ</h3>
+                    <h3 data-translate="Liên Hệ">Liên Hệ</h3>
                     <ul>
                         <li><i class="fas fa-map-marker-alt"></i> 123 Đường ABC, Quận XYZ, TP.HCM</li>
                         <li><i class="fas fa-phone"></i> 1900-xxxx</li>
@@ -143,6 +148,8 @@
         </div>
     </footer>
 
+    <script src="{{ url_for('static', filename='js/translations.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/theme-language.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     {% block extra_js %}{% endblock %}
 </body>

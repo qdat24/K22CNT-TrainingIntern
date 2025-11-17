@@ -1,0 +1,265 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Cài Đặt Website{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+        transition: border-color 0.3s;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #3498db;
+    }
+
+    .form-group textarea {
+        resize: vertical;
+        min-height: 80px;
+    }
+
+    .form-group small {
+        display: block;
+        margin-top: 5px;
+        color: #7f8c8d;
+        font-size: 12px;
+    }
+
+    .settings-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+    }
+
+    .settings-section {
+        background: white;
+        border-radius: 10px;
+        padding: 25px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .settings-section h3 {
+        font-size: 18px;
+        color: #2c3e50;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #3498db;
+    }
+
+    .preview-image {
+        max-width: 100%;
+        margin-top: 10px;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .logo-preview {
+        max-height: 100px;
+    }
+
+    .banner-preview {
+        max-height: 300px;
+    }
+
+    .btn-group {
+        margin-top: 30px;
+        text-align: right;
+    }
+
+    .btn-secondary {
+        background: #95a5a6;
+        color: white;
+        margin-right: 10px;
+    }
+
+    .btn-secondary:hover {
+        background: #7f8c8d;
+    }
+
+    @media (max-width: 992px) {
+        .settings-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>⚙️ Cài Đặt Website</h1>
+    <p>Quản lý logo, banner và thông tin liên hệ của website</p>
+</div>
+
+<form method="POST" action="{{ url_for('admin_settings') }}">
+    <div class="settings-grid">
+        <!-- Logo & Branding -->
+        <div class="settings-section">
+            <h3>🎨 Logo & Thương Hiệu</h3>
+            
+            <div class="form-group">
+                <label for="site_name">Tên Website</label>
+                <input type="text" 
+                       id="site_name" 
+                       name="site_name" 
+                       value="{{ settings.get('site_name', {}).get('setting_value', 'Nội Thất ABC') }}"
+                       required>
+                <small>Tên hiển thị của website</small>
+            </div>
+
+            <div class="form-group">
+                <label for="site_logo">URL Logo</label>
+                <input type="url" 
+                       id="site_logo" 
+                       name="site_logo" 
+                       value="{{ settings.get('site_logo', {}).get('setting_value', '') }}"
+                       placeholder="https://example.com/logo.png"
+                       required>
+                <small>URL hình ảnh logo (khuyến nghị: 300x100px, PNG hoặc SVG)</small>
+                {% if settings.get('site_logo') %}
+                <img src="{{ settings.get('site_logo').get('setting_value', '') }}" 
+                     alt="Logo Preview" 
+                     class="preview-image logo-preview"
+                     onerror="this.style.display='none'">
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Hero Banner -->
+        <div class="settings-section">
+            <h3>🖼️ Banner Trang Chủ</h3>
+            
+            <div class="form-group">
+                <label for="hero_banner_image">URL Hình Ảnh Banner</label>
+                <input type="url" 
+                       id="hero_banner_image" 
+                       name="hero_banner_image" 
+                       value="{{ settings.get('hero_banner_image', {}).get('setting_value', '') }}"
+                       placeholder="https://example.com/banner.jpg"
+                       required>
+                <small>URL hình ảnh banner (khuyến nghị: 1920x600px, JPG hoặc PNG)</small>
+                {% if settings.get('hero_banner_image') %}
+                <img src="{{ settings.get('hero_banner_image').get('setting_value', '') }}" 
+                     alt="Banner Preview" 
+                     class="preview-image banner-preview"
+                     onerror="this.style.display='none'">
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="hero_banner_title">Tiêu Đề Banner</label>
+                <input type="text" 
+                       id="hero_banner_title" 
+                       name="hero_banner_title" 
+                       value="{{ settings.get('hero_banner_title', {}).get('setting_value', '') }}"
+                       required>
+                <small>Tiêu đề chính hiển thị trên banner</small>
+            </div>
+
+            <div class="form-group">
+                <label for="hero_banner_subtitle">Phụ Đề Banner</label>
+                <input type="text" 
+                       id="hero_banner_subtitle" 
+                       name="hero_banner_subtitle" 
+                       value="{{ settings.get('hero_banner_subtitle', {}).get('setting_value', '') }}">
+                <small>Mô tả ngắn dưới tiêu đề</small>
+            </div>
+        </div>
+
+        <!-- Banner Button -->
+        <div class="settings-section">
+            <h3>🔘 Nút Call-to-Action</h3>
+            
+            <div class="form-group">
+                <label for="hero_banner_button_text">Text Nút</label>
+                <input type="text" 
+                       id="hero_banner_button_text" 
+                       name="hero_banner_button_text" 
+                       value="{{ settings.get('hero_banner_button_text', {}).get('setting_value', 'Khám Phá Ngay') }}">
+                <small>Text hiển thị trên nút</small>
+            </div>
+
+            <div class="form-group">
+                <label for="hero_banner_button_link">Link Nút</label>
+                <input type="text" 
+                       id="hero_banner_button_link" 
+                       name="hero_banner_button_link" 
+                       value="{{ settings.get('hero_banner_button_link', {}).get('setting_value', '/products') }}">
+                <small>Đường dẫn khi click vào nút (ví dụ: /products, /contact)</small>
+            </div>
+        </div>
+
+        <!-- Contact Info -->
+        <div class="settings-section">
+            <h3>📞 Thông Tin Liên Hệ</h3>
+            
+            <div class="form-group">
+                <label for="contact_phone">Số Điện Thoại</label>
+                <input type="text" 
+                       id="contact_phone" 
+                       name="contact_phone" 
+                       value="{{ settings.get('contact_phone', {}).get('setting_value', '') }}">
+                <small>Số điện thoại liên hệ</small>
+            </div>
+            <div class="form-group">
+                <label for="contact_facebook">Facebook</label>
+                <input type="url" 
+                       id="contact_facebook" 
+                       name="contact_facebook" 
+                       value="{{ settings.get('contact_facebook', {}).get('setting_value', '') }}">
+                <small>Link trang Facebook</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="contact_zalo">Zalo</label>
+                <input type="text" 
+                       id="contact_zalo" 
+                       name="contact_zalo" 
+                       value="{{ settings.get('contact_zalo', {}).get('setting_value', '') }}">
+                <small>Số Zalo</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="contact_email">Email</label>
+                <input type="email" 
+                       id="contact_email" 
+                       name="contact_email" 
+                       value="{{ settings.get('contact_email', {}).get('setting_value', '') }}">
+                <small>Email liên hệ</small>
+            </div>
+
+            <div class="form-group">
+                <label for="contact_address">Địa Chỉ</label>
+                <textarea id="contact_address" 
+                          name="contact_address" 
+                          rows="3">{{ settings.get('contact_address', {}).get('setting_value', '') }}</textarea>
+                <small>Địa chỉ công ty</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="btn-group">
+        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">Hủy</a>
+        <button type="submit" class="btn btn-primary">💾 Lưu Thay Đổi</button>
+    </div>
+</form>
+
+{% endblock %}

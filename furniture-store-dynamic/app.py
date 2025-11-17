@@ -11,16 +11,29 @@ from functools import wraps
 # Import database helper
 from db_helper import *
 
+# Import Web3 Payment
+from web3_payment import init_web3_payment
+
 app = Flask(__name__)
 app.secret_key = 'your-secret-key-here-change-in-production'
 
-# Context processor để cung cấp cart_count cho tất cả templates
+# Initialize Web3 Payment System
+init_web3_payment(app)
+
+# Context processor để cung cấp cart_count và site_settings cho tất cả templates
 @app.context_processor
-def inject_cart_count():
+def inject_globals():
     cart_count = 0
     if 'cart' in session:
         cart_count = sum(item['quantity'] for item in session['cart'])
-    return {'cart_count': cart_count}
+    
+    # Lấy site settings
+    site_settings = get_settings_dict()
+    
+    return {
+        'cart_count': cart_count,
+        'site_settings': site_settings
+    }
 
 # Custom filter để format currency
 @app.template_filter('format_currency')
@@ -37,7 +50,6 @@ BANK_INFO = {
     'bank_name': 'MBBANK',
     'account_number': '988888865',
     'account_name': 'DINH QUOC DAT'
-
 }
 
 # Email configuration (cấu hình nếu cần gửi email)
@@ -75,29 +87,398 @@ def send_order_confirmation_email(order):
         return
     
     try:
-        msg = MIMEMultipart()
+        msg = MIMEMultipart('alternative')
         msg['From'] = EMAIL_CONFIG['sender_email']
         msg['To'] = order.get('email', '')
-        msg['Subject'] = f"Xác nhận đơn hàng #{order['order_id']}"
+        msg['Subject'] = f"✅ Xác nhận đơn hàng #{order['order_id']} - Nội Thất ABC"
         
-        body = f"""
-        Cảm ơn bạn đã đặt hàng tại Nội Thất ABC!
+        # Tạo bảng sản phẩm HTML
+        items_html = ""
+        for item in order.get('items', []):
+            items_html += f"""
+            <tr>
+                <td style="padding: 15px; border-bottom: 1px solid #eee;">
+                    <strong>{item['name']}</strong>
+                </td>
+                <td style="padding: 15px; border-bottom: 1px solid #eee; text-align: center;">
+                    {item['quantity']}
+                </td>
+                <td style="padding: 15px; border-bottom: 1px solid #eee; text-align: right;">
+                    {item['price']:,.0f}₫
+                </td>
+                <td style="padding: 15px; border-bottom: 1px solid #eee; text-align: right;">
+                    <strong>{item['subtotal']:,.0f}₫</strong>
+                </td>
+            </tr>
+            """
         
-        Mã đơn hàng: {order['order_id']}
-        Tổng tiền: {order['total']:,.0f} VNĐ
-        
-        Chúng tôi sẽ liên hệ với bạn sớm nhất để xác nhận đơn hàng.
+        # Tạo HTML email đẹp
+        html_body = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <style>
+                body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }}
+                .container {{ max-width: 650px; margin: 0 auto; padding: 20px; }}
+                .header {{ background: linear-gradient(135deg, #27ae60 0%, #229954 100%); 
+                          color: white; padding: 40px 20px; text-align: center; border-radius: 10px 10px 0 0; }}
+                .header h1 {{ margin: 0; font-size: 28px; }}
+                .header .order-id {{ background: rgba(255,255,255,0.2); padding: 10px 20px; 
+                                    border-radius: 20px; display: inline-block; margin-top: 15px; 
+                                    font-size: 18px; font-weight: bold; }}
+                .content {{ background: white; padding: 30px; border: 1px solid #ddd; }}
+                .status-box {{ background: #d5f4e6; border-left: 4px solid #27ae60; 
+                              padding: 20px; border-radius: 5px; margin: 20px 0; }}
+                .info-section {{ background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }}
+                .info-row {{ margin: 10px 0; }}
+                .label {{ color: #666; font-weight: 600; display: inline-block; width: 140px; }}
+                .value {{ color: #333; }}
+                table {{ width: 100%; border-collapse: collapse; margin: 20px 0; }}
+                th {{ background: #f1f3f5; padding: 15px; text-align: left; font-weight: 600; 
+                     color: #495057; border-bottom: 2px solid #dee2e6; }}
+                .total-section {{ background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }}
+                .total-row {{ display: flex; justify-content: space-between; padding: 10px 0; }}
+                .total-row.grand {{ border-top: 2px solid #27ae60; margin-top: 10px; 
+                                   padding-top: 15px; font-size: 18px; font-weight: bold; color: #27ae60; }}
+                .payment-method {{ display: inline-block; background: #e3f2fd; color: #1976d2; 
+                                  padding: 8px 16px; border-radius: 20px; font-weight: 600; 
+                                  margin: 10px 0; }}
+                .contact-box {{ background: #fff3cd; padding: 20px; border-radius: 8px; 
+                               margin: 20px 0; border-left: 4px solid #ffc107; }}
+                .footer {{ background: #2c3e50; color: white; padding: 30px; text-align: center; 
+                          border-radius: 0 0 10px 10px; }}
+                .footer a {{ color: #3498db; text-decoration: none; }}
+                .button {{ display: inline-block; background: #27ae60; color: white; 
+                          padding: 12px 30px; text-decoration: none; border-radius: 5px; 
+                          margin: 15px 5px; font-weight: bold; }}
+                .button-secondary {{ background: #3498db; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>✅ ĐẶT HÀNG THÀNH CÔNG</h1>
+                    <div class="order-id">Mã đơn: #{order['order_id']}</div>
+                </div>
+                
+                <div class="content">
+                    <div class="status-box">
+                        <p style="margin: 0; font-size: 16px;">
+                            <strong>🎉 Cảm ơn bạn đã đặt hàng tại Nội Thất ABC!</strong>
+                        </p>
+                        <p style="margin: 10px 0 0 0;">
+                            Chúng tôi đã nhận được đơn hàng của bạn và đang xử lý. 
+                            Nhân viên sẽ liên hệ với bạn sớm nhất để xác nhận.
+                        </p>
+                    </div>
+
+                    <h3 style="color: #2c3e50; border-bottom: 2px solid #27ae60; padding-bottom: 10px;">
+                        📦 Chi Tiết Đơn Hàng
+                    </h3>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Sản phẩm</th>
+                                <th style="text-align: center; width: 80px;">Số lượng</th>
+                                <th style="text-align: right; width: 120px;">Đơn giá</th>
+                                <th style="text-align: right; width: 120px;">Thành tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {items_html}
+                        </tbody>
+                    </table>
+
+                    <div class="total-section">
+                        <div class="total-row">
+                            <span>Tạm tính:</span>
+                            <span>{order['subtotal']:,.0f}₫</span>
+                        </div>
+                        <div class="total-row">
+                            <span>Phí vận chuyển:</span>
+                            <span>{order['shipping_fee']:,.0f}₫</span>
+                        </div>
+                        <div class="total-row grand">
+                            <span>Tổng cộng:</span>
+                            <span>{order['total']:,.0f}₫</span>
+                        </div>
+                    </div>
+
+                    <h3 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">
+                        📋 Thông Tin Giao Hàng
+                    </h3>
+                    
+                    <div class="info-section">
+                        <div class="info-row">
+                            <span class="label">👤 Người nhận:</span>
+                            <span class="value">{order['customer_name']}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">📱 Số điện thoại:</span>
+                            <span class="value">{order['phone']}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">📧 Email:</span>
+                            <span class="value">{order.get('email', 'Không có')}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">🏠 Địa chỉ:</span>
+                            <span class="value">{order['address']}</span>
+                        </div>
+                        {f'<div class="info-row"><span class="label">📝 Ghi chú:</span><span class="value">{order["note"]}</span></div>' if order.get('note') else ''}
+                    </div>
+
+                    <div class="info-row" style="margin: 20px 0;">
+                        <span class="label">💳 Thanh toán:</span>
+                        <span class="payment-method">
+                            {'💵 Thanh toán khi nhận hàng (COD)' if order['payment_method'] == 'cod' 
+                             else '🏦 Chuyển khoản ngân hàng' if order['payment_method'] == 'bank_transfer'
+                             else '💳 USDT Crypto' if order['payment_method'] == 'usdt'
+                             else '💳 Thẻ tín dụng/ghi nợ'}
+                        </span>
+                    </div>
+
+                    <div class="contact-box">
+                        <p style="margin: 0 0 10px 0; font-weight: bold;">
+                            ⚠️ Cần hỗ trợ hoặc thay đổi đơn hàng?
+                        </p>
+                        <p style="margin: 0;">
+                            Vui lòng liên hệ: <strong>0357100129</strong> hoặc 
+                            email <strong>quocdat30075@gmail.com</strong>
+                        </p>
+                    </div>
+
+                    <div style="text-align: center; margin: 30px 0;">
+                        <a href="http://localhost:5000/account" class="button">
+                            Xem Chi Tiết Đơn Hàng
+                        </a>
+                        <a href="http://localhost:5000/products" class="button button-secondary">
+                            Tiếp Tục Mua Sắm
+                        </a>
+                    </div>
+                </div>
+
+                <div class="footer">
+                    <h3 style="margin: 0 0 15px 0;">🛋️ Nội Thất ABC</h3>
+                    <p style="margin: 5px 0;">Thiết Kế Không Gian Sống Của Bạn</p>
+                    <p style="margin: 15px 0 5px 0;">
+                        📞 Hotline: <strong>0357100129</strong> | 
+                        📧 Email: <strong>quocdat30075@gmail.com</strong>
+                    </p>
+                    <p style="margin: 5px 0;">🏠 Địa chỉ: Hà Đông, Hà Nội</p>
+                    <p style="margin: 20px 0 0 0; font-size: 12px; opacity: 0.8;">
+                        Email này được gửi tự động, vui lòng không trả lời trực tiếp email này.
+                    </p>
+                </div>
+            </div>
+        </body>
+        </html>
         """
         
-        msg.attach(MIMEText(body, 'plain'))
+        msg.attach(MIMEText(html_body, 'html'))
         
         server = smtplib.SMTP(EMAIL_CONFIG['smtp_server'], EMAIL_CONFIG['smtp_port'])
         server.starttls()
         server.login(EMAIL_CONFIG['sender_email'], EMAIL_CONFIG['sender_password'])
         server.send_message(msg)
         server.quit()
+        
+        print(f"✅ Đã gửi email xác nhận đơn hàng đến {order.get('email', 'N/A')}")
+        
     except Exception as e:
-        print(f"Lỗi gửi email: {e}")
+        print(f"❌ Lỗi gửi email xác nhận đơn hàng: {e}")
+
+# ==================== CONTACT EMAIL FUNCTIONS ====================
+
+def send_contact_email(contact_data):
+    """Gửi email thông báo có liên hệ mới đến admin"""
+    if not EMAIL_CONFIG['enabled']:
+        return False
+    
+    try:
+        # Email gửi đến admin
+        msg = MIMEMultipart('alternative')
+        msg['From'] = EMAIL_CONFIG['sender_email']
+        msg['To'] = EMAIL_CONFIG['sender_email']  # Gửi đến chính mình
+        msg['Subject'] = f"🔔 Liên hệ mới: {contact_data['subject']}"
+        
+        # HTML email đẹp cho admin
+        html_body = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <style>
+                body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+                .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+                .header {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                          color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }}
+                .content {{ background: #f9f9f9; padding: 30px; border: 1px solid #ddd; }}
+                .info-row {{ margin: 15px 0; padding: 15px; background: white; border-radius: 5px; }}
+                .label {{ font-weight: bold; color: #667eea; display: inline-block; width: 120px; }}
+                .value {{ color: #333; }}
+                .message-box {{ background: white; padding: 20px; border-left: 4px solid #667eea; 
+                               margin: 20px 0; border-radius: 5px; }}
+                .footer {{ text-align: center; padding: 20px; color: #999; font-size: 12px; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>📬 Liên Hệ Mới Từ Website</h1>
+                </div>
+                <div class="content">
+                    <div class="info-row">
+                        <span class="label">👤 Họ tên:</span>
+                        <span class="value">{contact_data['name']}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">📧 Email:</span>
+                        <span class="value">{contact_data['email']}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">📱 Điện thoại:</span>
+                        <span class="value">{contact_data.get('phone', 'Không có')}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">📌 Chủ đề:</span>
+                        <span class="value">{contact_data['subject']}</span>
+                    </div>
+                    <div class="message-box">
+                        <p style="margin: 0 0 10px 0; font-weight: bold; color: #667eea;">💬 Nội dung tin nhắn:</p>
+                        <p style="margin: 0; white-space: pre-wrap;">{contact_data['message']}</p>
+                    </div>
+                    <p style="text-align: center; margin-top: 30px;">
+                        <a href="http://localhost:5000/admin/contacts" 
+                           style="background: #667eea; color: white; padding: 12px 30px; 
+                                  text-decoration: none; border-radius: 5px; display: inline-block;">
+                            Xem trong Admin Panel
+                        </a>
+                    </p>
+                </div>
+                <div class="footer">
+                    <p>Email tự động từ hệ thống Nội Thất ABC</p>
+                    <p>Thời gian: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+        
+        msg.attach(MIMEText(html_body, 'html'))
+        
+        # Gửi email
+        server = smtplib.SMTP(EMAIL_CONFIG['smtp_server'], EMAIL_CONFIG['smtp_port'])
+        server.starttls()
+        server.login(EMAIL_CONFIG['sender_email'], EMAIL_CONFIG['sender_password'])
+        server.send_message(msg)
+        server.quit()
+        
+        return True
+    except Exception as e:
+        print(f"Lỗi gửi email thông báo: {e}")
+        return False
+
+def send_contact_reply_email(contact_data):
+    """Gửi email tự động trả lời khách hàng"""
+    if not EMAIL_CONFIG['enabled']:
+        return False
+    
+    try:
+        msg = MIMEMultipart('alternative')
+        msg['From'] = EMAIL_CONFIG['sender_email']
+        msg['To'] = contact_data['email']
+        msg['Subject'] = f"Cảm ơn bạn đã liên hệ - {contact_data['subject']}"
+        
+        # HTML email đẹp cho khách hàng
+        html_body = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <style>
+                body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+                .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+                .header {{ background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); 
+                          color: white; padding: 40px; text-align: center; border-radius: 10px 10px 0 0; }}
+                .header h1 {{ margin: 0; font-size: 28px; }}
+                .content {{ background: white; padding: 40px; border: 1px solid #ddd; }}
+                .highlight {{ background: #f0f8ff; padding: 20px; border-radius: 5px; 
+                             border-left: 4px solid #3498db; margin: 20px 0; }}
+                .button {{ display: inline-block; background: #3498db; color: white; 
+                          padding: 15px 40px; text-decoration: none; border-radius: 5px; 
+                          margin: 20px 0; font-weight: bold; }}
+                .footer {{ background: #f9f9f9; padding: 30px; text-align: center; 
+                          border-top: 3px solid #3498db; }}
+                .contact-info {{ margin: 20px 0; padding: 20px; background: #f9f9f9; 
+                                border-radius: 5px; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>🛋️ Nội Thất ABC</h1>
+                    <p style="margin: 10px 0 0 0; font-size: 16px;">Cảm ơn bạn đã liên hệ với chúng tôi!</p>
+                </div>
+                <div class="content">
+                    <p>Xin chào <strong>{contact_data['name']}</strong>,</p>
+                    
+                    <p>Chúng tôi đã nhận được tin nhắn của bạn với nội dung:</p>
+                    
+                    <div class="highlight">
+                        <p style="margin: 0 0 10px 0;"><strong>📌 Chủ đề:</strong> {contact_data['subject']}</p>
+                        <p style="margin: 0;"><strong>💬 Nội dung:</strong></p>
+                        <p style="margin: 10px 0 0 0; white-space: pre-wrap;">{contact_data['message']}</p>
+                    </div>
+                    
+                    <p>Đội ngũ chúng tôi sẽ xem xét và phản hồi bạn trong vòng <strong>24 giờ làm việc</strong>.</p>
+                    
+                    <p style="text-align: center;">
+                        <a href="http://localhost:5000" class="button">Ghé Thăm Website</a>
+                    </p>
+                    
+                    <div class="contact-info">
+                        <p style="margin: 0 0 10px 0; font-weight: bold; color: #2c3e50;">
+                            📞 Thông Tin Liên Hệ
+                        </p>
+                        <p style="margin: 5px 0;">📱 Hotline: 0357100129</p>
+                        <p style="margin: 5px 0;">📧 Email: quocdat30075@gmail.com</p>
+                        <p style="margin: 5px 0;">🏠 Địa chỉ: Hà Đông Hà Nội</p>
+                    </div>
+                    
+                    <p>Nếu bạn cần hỗ trợ gấp, vui lòng gọi trực tiếp hotline của chúng tôi.</p>
+                    
+                    <p style="margin-top: 30px;">Trân trọng,<br>
+                    <strong>Đội ngũ Nội Thất ABC</strong></p>
+                </div>
+                <div class="footer">
+                    <p style="margin: 0 0 10px 0; color: #666;">
+                        🛋️ Nội Thất ABC - Thiết Kế Không Gian Sống Của Bạn
+                    </p>
+                    <p style="margin: 5px 0; font-size: 12px; color: #999;">
+                        Email này được gửi tự động, vui lòng không trả lời email này.
+                    </p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+        
+        msg.attach(MIMEText(html_body, 'html'))
+        
+        # Gửi email
+        server = smtplib.SMTP(EMAIL_CONFIG['smtp_server'], EMAIL_CONFIG['smtp_port'])
+        server.starttls()
+        server.login(EMAIL_CONFIG['sender_email'], EMAIL_CONFIG['sender_password'])
+        server.send_message(msg)
+        server.quit()
+        
+        return True
+    except Exception as e:
+        print(f"Lỗi gửi email trả lời: {e}")
+        return False
 
 # ==================== PUBLIC ROUTES ====================
 
@@ -312,6 +693,10 @@ def checkout():
     if 'customer_logged_in' in session:
         customer = get_customer_by_id(session['customer_id'])
     
+    # Lưu tổng tiền vào session cho Web3 payment
+    session['cart_total'] = total + shipping_fee
+    session['pending_order_id'] = None  # Sẽ set sau khi tạo order
+    
     return render_template('checkout.html',
                          cart_items=cart_items,
                          subtotal=total,
@@ -376,13 +761,23 @@ def place_order():
     if not result:
         return jsonify({'success': False, 'message': 'Không thể tạo đơn hàng'})
     
+    # Lưu order_id vào session cho Web3 payment
+    session['pending_order_id'] = order_id
+    
     # Xóa giỏ hàng
     session['cart'] = []
     
     # Chuyển hướng dựa trên phương thức thanh toán
     payment_method = data.get('payment_method')
     
-    if payment_method == 'bank_transfer':
+    if payment_method == 'usdt':
+        # USDT Web3 Payment
+        return jsonify({
+            'success': True, 
+            'order_id': order_id,
+            'redirect': 'usdt_payment'
+        })
+    elif payment_method == 'bank_transfer':
         return jsonify({
             'success': True, 
             'order_id': order_id,
@@ -490,8 +885,38 @@ def about():
 def policy():
     return render_template('policy.html')
 
-@app.route('/contact')
+@app.route('/contact', methods=['GET', 'POST'])
 def contact():
+    """Trang liên hệ"""
+    if request.method == 'POST':
+        # Lấy dữ liệu từ form
+        contact_data = {
+            'name': request.form.get('name'),
+            'email': request.form.get('email'),
+            'phone': request.form.get('phone', ''),
+            'subject': request.form.get('subject'),
+            'message': request.form.get('message')
+        }
+        
+        # Validate
+        if not all([contact_data['name'], contact_data['email'], 
+                   contact_data['subject'], contact_data['message']]):
+            flash('Vui lòng điền đầy đủ thông tin bắt buộc', 'error')
+            return render_template('contact.html')
+        
+        # Lưu vào database
+        if create_contact(contact_data):
+            # Gửi email thông báo cho admin
+            send_contact_email(contact_data)
+            
+            # Gửi email trả lời tự động cho khách hàng
+            send_contact_reply_email(contact_data)
+            
+            flash('Cảm ơn bạn đã liên hệ! Chúng tôi sẽ phản hồi trong 24h.', 'success')
+            return redirect(url_for('contact'))
+        else:
+            flash('Có lỗi xảy ra, vui lòng thử lại sau', 'error')
+    
     return render_template('contact.html')
 
 @app.route('/guide')
@@ -893,5 +1318,211 @@ def admin_update_order_status(order_id):
     
     return redirect(url_for('admin_order_detail', order_id=order_id))
 
+@app.route('/admin/settings', methods=['GET', 'POST'])
+@admin_required
+def admin_settings():
+    """Quản lý cài đặt website (logo, banner, thông tin liên hệ)"""
+    if request.method == 'POST':
+        # Lấy tất cả các cài đặt từ form
+        settings_to_update = {}
+        
+        # Các setting keys cần cập nhật
+        setting_keys = [
+            'site_logo', 'site_name',
+            'hero_banner_image', 'hero_banner_title', 'hero_banner_subtitle',
+            'hero_banner_button_text', 'hero_banner_button_link',
+            'contact_phone', 'contact_email', 'contact_address'
+        ]
+        
+        for key in setting_keys:
+            value = request.form.get(key, '')
+            if value:  # Chỉ cập nhật nếu có giá trị
+                settings_to_update[key] = value
+        
+        # Cập nhật tất cả settings
+        if update_multiple_settings(settings_to_update):
+            flash('Cập nhật cài đặt thành công!', 'success')
+        else:
+            flash('Có lỗi xảy ra khi cập nhật cài đặt', 'error')
+        
+        return redirect(url_for('admin_settings'))
+    
+    # GET request - hiển thị form
+    settings = get_all_settings()
+    settings_dict = {s['setting_key']: s for s in settings} if settings else {}
+    
+    return render_template('admin/settings.html', settings=settings_dict)
+
+# ============================================
+# ROUTES QUẢN LÝ KHÁCH HÀNG (CUSTOMERS)
+# ============================================
+
+@app.route('/admin/customers')
+@admin_required
+def admin_customers():
+    """Danh sách khách hàng"""
+    # Lấy tham số từ URL
+    page = request.args.get('page', 1, type=int)
+    search = request.args.get('search', '')
+    status_filter = request.args.get('status', '')
+    
+    # Phân trang
+    per_page = 20
+    offset = (page - 1) * per_page
+    
+    # Lấy danh sách khách hàng
+    customers = get_all_customers(
+        search=search if search else None,
+        status_filter=status_filter if status_filter else None,
+        limit=per_page,
+        offset=offset
+    )
+    
+    # Đếm tổng số khách hàng
+    total_customers = count_customers(
+        search=search if search else None,
+        status_filter=status_filter if status_filter else None
+    )
+    
+    # Tính tổng số trang
+    total_pages = (total_customers + per_page - 1) // per_page
+    
+    # Lấy thống kê
+    stats = get_customer_stats()
+    
+    return render_template('admin/customers.html',
+                         customers=customers,
+                         stats=stats,
+                         page=page,
+                         total_pages=total_pages,
+                         total_customers=total_customers,
+                         search=search,
+                         status_filter=status_filter)
+
+@app.route('/admin/customers/<int:customer_id>')
+@admin_required
+def admin_customer_detail(customer_id):
+    """Chi tiết khách hàng"""
+    customer = get_customer_by_id(customer_id)
+    
+    if not customer:
+        flash('Không tìm thấy khách hàng', 'error')
+        return redirect(url_for('admin_customers'))
+    
+    # Lấy đơn hàng của khách hàng
+    orders_query = "SELECT * FROM orders WHERE customer_id = %s ORDER BY created_at DESC"
+    connection = get_db_connection()
+    if connection:
+        try:
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute(orders_query, (customer_id,))
+            customer_orders = cursor.fetchall()
+        except:
+            customer_orders = []
+        finally:
+            cursor.close()
+            connection.close()
+    else:
+        customer_orders = []
+    
+    return render_template('admin/customer_detail.html',
+                         customer=customer,
+                         orders=customer_orders)
+
+@app.route('/admin/customers/<int:customer_id>/edit', methods=['GET', 'POST'])
+@admin_required
+def admin_edit_customer(customer_id):
+    """Chỉnh sửa thông tin khách hàng"""
+    customer = get_customer_by_id(customer_id)
+    
+    if not customer:
+        flash('Không tìm thấy khách hàng', 'error')
+        return redirect(url_for('admin_customers'))
+    
+    if request.method == 'POST':
+        data = {
+            'full_name': request.form.get('full_name'),
+            'phone': request.form.get('phone'),
+            'address': request.form.get('address'),
+            'is_active': request.form.get('is_active') == 'true'
+        }
+        
+        result = update_customer_by_admin(customer_id, data)
+        
+        if result:
+            flash('Cập nhật thông tin khách hàng thành công!', 'success')
+            return redirect(url_for('admin_customer_detail', customer_id=customer_id))
+        else:
+            flash('Lỗi khi cập nhật thông tin khách hàng', 'error')
+    
+    return render_template('admin/customer_edit.html', customer=customer)
+
+@app.route('/admin/customers/<int:customer_id>/toggle-status', methods=['POST'])
+@admin_required
+def admin_toggle_customer_status(customer_id):
+    """Kích hoạt/Vô hiệu hóa khách hàng"""
+    result = toggle_customer_status(customer_id)
+    
+    if result:
+        flash('Đã cập nhật trạng thái khách hàng', 'success')
+    else:
+        flash('Lỗi khi cập nhật trạng thái', 'error')
+    
+    return redirect(url_for('admin_customers'))
+
+@app.route('/admin/customers/<int:customer_id>/delete', methods=['POST'])
+@admin_required
+def admin_delete_customer(customer_id):
+    """Xóa khách hàng"""
+    customer = get_customer_by_id(customer_id)
+    
+    if not customer:
+        flash('Không tìm thấy khách hàng', 'error')
+        return redirect(url_for('admin_customers'))
+    
+    result = delete_customer(customer_id)
+    
+    if result:
+        flash(f'Đã xóa khách hàng {customer["full_name"]}', 'success')
+    else:
+        flash('Lỗi khi xóa khách hàng', 'error')
+    
+    return redirect(url_for('admin_customers'))
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
+    # ============================================
+# THÊM ROUTE NÀY VÀO FILE app.py
+# ============================================
+
+@app.route('/usdt-payment')
+def usdt_payment():
+    """
+    USDT Web3 Payment Page
+    URL: /usdt-payment?temp_id=XXX&amount=YYY
+    """
+    temp_id = request.args.get('temp_id', '')
+    amount = request.args.get('amount', 0)
+    name = request.args.get('name', '')
+    email = request.args.get('email', '')
+    
+    try:
+        amount = float(amount)
+    except (ValueError, TypeError):
+        amount = 0
+    
+    # Calculate USDT amount
+    usdt_rate = 25000  # 1 USDT = 25,000 VND
+    usdt_amount = round(amount / usdt_rate, 2)
+    
+    # Your wallet address for receiving USDT
+    recipient_address = '0x3fd86c3728b38cb6b09fa7d4914888dcfef1518c'  # THAY ĐỊA CHỈ CỦA BẠN
+    
+    return render_template('usdt-payment.html',
+                         temp_id=temp_id,
+                         amount=amount,
+                         usdt_amount=usdt_amount,
+                         usdt_rate=usdt_rate,
+                         recipient_address=recipient_address,
+                         name=name,
+                         email=email)

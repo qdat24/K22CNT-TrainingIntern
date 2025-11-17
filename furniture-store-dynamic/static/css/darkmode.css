@@ -1,0 +1,815 @@
+/* ============================================
+   DARK MODE - MEGA ULTRA STRONG VERSION
+   Override TUYỆT ĐỐI mọi thứ
+   ============================================ */
+
+/* ===== TOGGLE BUTTONS ===== */
+.theme-toggle-btn {
+    position: fixed !important;
+    bottom: 20px !important;
+    right: 20px !important;
+    width: 50px !important;
+    height: 50px !important;
+    border-radius: 50% !important;
+    background: linear-gradient(135deg, #3498db, #2980b9) !important;
+    color: white !important;
+    border: none !important;
+    cursor: pointer !important;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.3rem !important;
+    z-index: 99999 !important;
+    transition: all 0.3s ease !important;
+}
+
+.theme-toggle-btn:hover {
+    transform: scale(1.15) rotate(20deg) !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4) !important;
+}
+
+.language-toggle-btn {
+    position: fixed !important;
+    bottom: 80px !important;
+    right: 20px !important;
+    padding: 10px 15px !important;
+    border-radius: 25px !important;
+    background: linear-gradient(135deg, #3498db, #2980b9) !important;
+    color: white !important;
+    border: none !important;
+    cursor: pointer !important;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+    z-index: 99999 !important;
+    transition: all 0.3s ease !important;
+}
+
+.language-toggle-btn:hover {
+    transform: translateY(-3px) !important;
+}
+
+body.dark-mode .theme-toggle-btn {
+    background: linear-gradient(135deg, #f39c12, #f1c40f) !important;
+}
+
+/* ===== BODY & GLOBAL ===== */
+body.dark-mode {
+    background-color: #1a1a2e !important;
+    color: #e4e4e4 !important;
+}
+
+/* ===== FORCE NỀN TỐI CHO MỌI BACKGROUND TRẮNG ===== */
+body.dark-mode * {
+    background-color: inherit !important;
+}
+
+body.dark-mode [style*="background: white"],
+body.dark-mode [style*="background: #fff"],
+body.dark-mode [style*="background:#fff"],
+body.dark-mode [style*="background-color: white"],
+body.dark-mode [style*="background-color: #fff"],
+body.dark-mode [style*="background-color:#fff"],
+body.dark-mode [style*="background-color: #FFF"],
+body.dark-mode [style*="background-color: #ffffff"],
+body.dark-mode [style*="background-color:#ffffff"] {
+    background-color: #16213e !important;
+}
+
+/* ===== TẤT CẢ CARDS - OVERRIDE CỰC MẠNH ===== */
+body.dark-mode .card,
+body.dark-mode .card-body,
+body.dark-mode .card-content,
+body.dark-mode .product-card,
+body.dark-mode .feature-card,
+body.dark-mode .testimonial,
+body.dark-mode .testimonial-card,
+body.dark-mode .review-card,
+body.dark-mode .customer-review,
+body.dark-mode .service-card,
+body.dark-mode .info-card,
+body.dark-mode .stat-card,
+body.dark-mode .cart-item,
+body.dark-mode .order-item,
+body.dark-mode [class*="card"],
+body.dark-mode [class*="Card"],
+body.dark-mode div[class*="card"],
+body.dark-mode div[class*="Card"] {
+    background-color: #16213e !important;
+    background: #16213e !important;
+    border: 1px solid #2d3748 !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
+}
+
+/* Override inline styles cho cards */
+body.dark-mode .card[style],
+body.dark-mode .product-card[style],
+body.dark-mode .testimonial[style],
+body.dark-mode [class*="card"][style] {
+    background-color: #16213e !important;
+    background: #16213e !important;
+}
+
+/* TẤT CẢ TEXT TRONG CARDS PHẢI SÁNG */
+body.dark-mode .card,
+body.dark-mode .card *,
+body.dark-mode .card-body,
+body.dark-mode .card-body *,
+body.dark-mode .product-card,
+body.dark-mode .product-card *,
+body.dark-mode .feature-card,
+body.dark-mode .feature-card *,
+body.dark-mode .testimonial,
+body.dark-mode .testimonial *,
+body.dark-mode .testimonial-card,
+body.dark-mode .testimonial-card *,
+body.dark-mode .review-card,
+body.dark-mode .review-card *,
+body.dark-mode .customer-review,
+body.dark-mode .customer-review *,
+body.dark-mode .service-card,
+body.dark-mode .service-card *,
+body.dark-mode .info-card,
+body.dark-mode .info-card *,
+body.dark-mode .stat-card,
+body.dark-mode .stat-card *,
+body.dark-mode .cart-item,
+body.dark-mode .cart-item *,
+body.dark-mode [class*="card"],
+body.dark-mode [class*="card"] *,
+body.dark-mode [class*="Card"],
+body.dark-mode [class*="Card"] * {
+    color: #e4e4e4 !important;
+}
+
+/* PRODUCT CARD - ĐẶC BIỆT QUAN TRỌNG */
+body.dark-mode .product-card {
+    background: #16213e !important;
+    background-color: #16213e !important;
+    border: 1px solid #2d3748 !important;
+}
+
+body.dark-mode .product-card h3,
+body.dark-mode .product-card h4,
+body.dark-mode .product-card h5,
+body.dark-mode .product-card p,
+body.dark-mode .product-card span,
+body.dark-mode .product-card div,
+body.dark-mode .product-card .product-name,
+body.dark-mode .product-card .product-title {
+    color: #e4e4e4 !important;
+    background: transparent !important;
+}
+
+/* TÊN SẢN PHẨM */
+body.dark-mode .product-card h3,
+body.dark-mode .product-name,
+body.dark-mode .product-title {
+    color: #ffffff !important;
+    font-weight: 600 !important;
+}
+
+/* GIÁ SẢN PHẨM */
+body.dark-mode .product-card .price,
+body.dark-mode .price,
+body.dark-mode .product-price,
+body.dark-mode [class*="price"] {
+    color: #3282b8 !important;
+    font-weight: bold !important;
+}
+
+body.dark-mode .old-price,
+body.dark-mode .original-price,
+body.dark-mode [class*="old-price"] {
+    color: #888888 !important;
+    text-decoration: line-through !important;
+}
+
+/* DISCOUNT BADGE */
+body.dark-mode .disc-badge,
+body.dark-mode .discount-badge,
+body.dark-mode [class*="discount"] {
+    background-color: #e74c3c !important;
+    color: #ffffff !important;
+}
+
+/* STARS/RATINGS */
+body.dark-mode .stars,
+body.dark-mode .rating,
+body.dark-mode i.fa-star,
+body.dark-mode .fa-star,
+body.dark-mode [class*="star"] {
+    color: #f1c40f !important;
+}
+
+/* PRODUCT IMAGE CONTAINER */
+body.dark-mode .product-image,
+body.dark-mode .card-image,
+body.dark-mode .product-img {
+    border-bottom: 1px solid #2d3748 !important;
+    background: transparent !important;
+}
+
+/* CARD CONTENT AREA */
+body.dark-mode .card-content,
+body.dark-mode .product-content,
+body.dark-mode .product-info {
+    background: transparent !important;
+    padding: 15px !important;
+}
+
+/* ===== CARD HEADERS ===== */
+body.dark-mode .card-header,
+body.dark-mode .card-title {
+    background-color: #0f4c75 !important;
+    color: #ffffff !important;
+    border-bottom: 1px solid #2d3748 !important;
+}
+
+body.dark-mode .card-header *,
+body.dark-mode .card-title * {
+    color: #ffffff !important;
+}
+
+/* ===== TOP BAR ===== */
+body.dark-mode .top-bar {
+    background-color: #0f0f1e !important;
+    border-bottom: 1px solid #2d3748 !important;
+}
+
+body.dark-mode .top-bar,
+body.dark-mode .top-bar * {
+    color: #b8b8b8 !important;
+}
+
+/* ===== HEADER & NAVIGATION ===== */
+body.dark-mode .header,
+body.dark-mode .navbar {
+    background-color: #16213e !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3) !important;
+}
+
+body.dark-mode .logo {
+    color: #e4e4e4 !important;
+}
+
+body.dark-mode .nav-links a,
+body.dark-mode .navbar a {
+    color: #e4e4e4 !important;
+}
+
+body.dark-mode .nav-links a:hover,
+body.dark-mode .navbar a:hover {
+    color: #3282b8 !important;
+}
+
+body.dark-mode .cart-count {
+    background-color: #e74c3c !important;
+    color: white !important;
+}
+
+/* ===== DROPDOWN ===== */
+body.dark-mode .dropdown-content {
+    background-color: #16213e !important;
+    border: 1px solid #2d3748 !important;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.4) !important;
+}
+
+body.dark-mode .dropdown-content a {
+    color: #e4e4e4 !important;
+}
+
+body.dark-mode .dropdown-content a:hover {
+    background-color: #0f4c75 !important;
+    color: #ffffff !important;
+}
+
+/* ===== HERO SECTIONS ===== */
+body.dark-mode .hero,
+body.dark-mode .hero-section,
+body.dark-mode .hero-modern,
+body.dark-mode .contact-hero {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%) !important;
+}
+
+body.dark-mode .hero *,
+body.dark-mode .hero-section *,
+body.dark-mode .hero-modern *,
+body.dark-mode .contact-hero * {
+    color: #e4e4e4 !important;
+}
+
+/* ===== SEARCH & FILTERS ===== */
+body.dark-mode .search-section {
+    background-color: #16213e !important;
+}
+
+body.dark-mode .search-section * {
+    color: #e4e4e4 !important;
+}
+
+body.dark-mode .search-box-new input,
+body.dark-mode .filter-select-new,
+body.dark-mode input[type="search"],
+body.dark-mode input[type="text"] {
+    background-color: #1a1a2e !important;
+    color: #e4e4e4 !important;
+    border: 1px solid #2d3748 !important;
+}
+
+body.dark-mode .search-box-new input::placeholder,
+body.dark-mode input::placeholder {
+    color: #888888 !important;
+}
+
+body.dark-mode .search-box-new i {
+    color: #888888 !important;
+}
+
+/* ===== CATEGORIES ===== */
+body.dark-mode .categories-modern {
+    background-color: #1a1a2e !important;
+}
+
+body.dark-mode .cat-grid {
+    background: transparent !important;
+}
+
+body.dark-mode .cat-item {
+    background-color: #16213e !important;
+    border: 1px solid #2d3748 !important;
+}
+
+body.dark-mode .cat-item *,
+body.dark-mode .cat-grid * {
+    color: #e4e4e4 !important;
+}
+
+body.dark-mode .cat-icon {
+    color: #3282b8 !important;
+}
+
+body.dark-mode .category-btn {
+    background-color: #16213e !important;
+    color: #e4e4e4 !important;
+    border: 1px solid #2d3748 !important;
+}
+
+body.dark-mode .category-btn:hover,
+body.dark-mode .category-btn.active {
+    background-color: #0f4c75 !important;
+    color: #ffffff !important;
+}
+
+/* ===== PRODUCT GRID ===== */
+body.dark-mode .product-grid,
+body.dark-mode .products-grid,
+body.dark-mode [class*="product-grid"] {
+    background: transparent !important;
+}
+
+/* ===== ALL HEADINGS ===== */
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6,
+body.dark-mode .section-title {
+    color: #e4e4e4 !important;
+}
+
+/* ===== ALL TEXT ELEMENTS ===== */
+body.dark-mode p,
+body.dark-mode span,
+body.dark-mode div,
+body.dark-mode label,
+body.dark-mode li,
+body.dark-mode td,
+body.dark-mode strong,
+body.dark-mode b {
+    color: #e4e4e4 !important;
+}
+
+/* ===== LINKS ===== */
+body.dark-mode a {
+    color: #3282b8 !important;
+}
+
+body.dark-mode a:hover {
+    color: #5fa3d0 !important;
+}
+
+/* ===== AUTH PAGES ===== */
+body.dark-mode .auth-container {
+    background-color: #1a1a2e !important;
+}
+
+body.dark-mode .auth-box {
+    background-color: #16213e !important;
+    border: 1px solid #2d3748 !important;
+}
+
+body.dark-mode .auth-container *,
+body.dark-mode .auth-box * {
+    color: #e4e4e4 !important;
+}
+
+body.dark-mode .auth-sub,
+body.dark-mode .auth-links {
+    color: #b8b8b8 !important;
+}
+
+/* ===== ACCOUNT PAGES ===== */
+body.dark-mode .account-container,
+body.dark-mode .account-section,
+body.dark-mode .account-content {
+    background-color: #16213e !important;
+    border: 1px solid #2d3748 !important;
+}
+
+body.dark-mode .account-sidebar {
+    background-color: #16213e !important;
+    border: 1px solid #2d3748 !important;
+}
+
+body.dark-mode .account-menu a {
+    color: #e4e4e4 !important;
+}
+
+body.dark-mode .account-menu a:hover,
+body.dark-mode .account-menu a.active {
+    background-color: #0f4c75 !important;
+    color: #ffffff !important;
+}
+
+/* ===== ADMIN DASHBOARD ===== */
+body.dark-mode .page-header {
+    background-color: #16213e !important;
+    border-bottom: 1px solid #2d3748 !important;
+}
+
+body.dark-mode .page-header * {
+    color: #e4e4e4 !important;
+}
+
+body.dark-mode .stat-value {
+    color: #3282b8 !important;
+    font-weight: bold !important;
+}
+
+/* ===== FORMS & INPUTS ===== */
+body.dark-mode label,
+body.dark-mode .form-group label {
+    color: #e4e4e4 !important;
+}
+
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea,
+body.dark-mode .form-control {
+    background-color: #1a1a2e !important;
+    color: #e4e4e4 !important;
+    border: 1px solid #2d3748 !important;
+}
+
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder {
+    color: #888888 !important;
+}
+
+body.dark-mode input:focus,
+body.dark-mode select:focus,
+body.dark-mode textarea:focus {
+    border-color: #3282b8 !important;
+    box-shadow: 0 0 0 3px rgba(50, 130, 184, 0.2) !important;
+}
+
+/* ===== BUTTONS ===== */
+body.dark-mode .btn,
+body.dark-mode button,
+body.dark-mode button[type="submit"],
+body.dark-mode button[type="button"] {
+    background-color: #0f4c75 !important;
+    color: #ffffff !important;
+    border: none !important;
+}
+
+body.dark-mode .btn:hover,
+body.dark-mode button:hover {
+    background-color: #3282b8 !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .btn-secondary {
+    background-color: #16213e !important;
+    color: #e4e4e4 !important;
+    border: 1px solid #2d3748 !important;
+}
+
+body.dark-mode .btn-danger {
+    background-color: #c0392b !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .btn-success {
+    background-color: #27ae60 !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .btn-warning {
+    background-color: #f39c12 !important;
+    color: #ffffff !important;
+}
+
+/* ===== TABLES ===== */
+body.dark-mode table,
+body.dark-mode .table {
+    background-color: #16213e !important;
+    border: 1px solid #2d3748 !important;
+}
+
+body.dark-mode thead,
+body.dark-mode th {
+    background-color: #0f4c75 !important;
+    color: #ffffff !important;
+    border-bottom: 2px solid #2d3748 !important;
+}
+
+body.dark-mode td {
+    border-bottom: 1px solid #2d3748 !important;
+    color: #e4e4e4 !important;
+    background-color: #16213e !important;
+}
+
+body.dark-mode td * {
+    color: #e4e4e4 !important;
+}
+
+body.dark-mode tr:hover td {
+    background-color: rgba(15, 76, 117, 0.2) !important;
+}
+
+/* ===== CART & CHECKOUT ===== */
+body.dark-mode .cart-section,
+body.dark-mode .cart-summary,
+body.dark-mode .order-summary,
+body.dark-mode .checkout-section {
+    background-color: #16213e !important;
+    border: 1px solid #2d3748 !important;
+}
+
+body.dark-mode .cart-total {
+    color: #3282b8 !important;
+    font-weight: bold !important;
+}
+
+/* ===== FOOTER ===== */
+body.dark-mode .footer {
+    background-color: #0f0f1e !important;
+    color: #b8b8b8 !important;
+    border-top: 1px solid #2d3748 !important;
+}
+
+body.dark-mode .footer h3 {
+    color: #e4e4e4 !important;
+}
+
+body.dark-mode .footer a {
+    color: #b8b8b8 !important;
+}
+
+body.dark-mode .footer a:hover {
+    color: #3282b8 !important;
+}
+
+/* ===== MODALS ===== */
+body.dark-mode .modal,
+body.dark-mode .dialog {
+    background-color: #16213e !important;
+    border: 1px solid #2d3748 !important;
+}
+
+body.dark-mode .modal * {
+    color: #e4e4e4 !important;
+}
+
+body.dark-mode .modal-header {
+    background-color: #0f4c75 !important;
+    border-bottom: 1px solid #2d3748 !important;
+}
+
+body.dark-mode .modal-header * {
+    color: #ffffff !important;
+}
+
+/* ===== ALERTS ===== */
+body.dark-mode .alert-success {
+    background-color: #1f4d2f !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .alert-error,
+body.dark-mode .alert-danger {
+    background-color: #4d1f1f !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .alert-warning {
+    background-color: #5d4a1f !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .alert-info {
+    background-color: #1f3a4d !important;
+    color: #ffffff !important;
+}
+
+/* ===== BADGES ===== */
+body.dark-mode .badge {
+    background-color: #0f4c75 !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .badge-success {
+    background-color: #27ae60 !important;
+}
+
+body.dark-mode .badge-danger {
+    background-color: #c0392b !important;
+}
+
+body.dark-mode .badge-warning {
+    background-color: #f39c12 !important;
+}
+
+/* ===== ACCORDIONS ===== */
+body.dark-mode .accordion,
+body.dark-mode .faq-item {
+    background-color: #16213e !important;
+    border: 1px solid #2d3748 !important;
+}
+
+body.dark-mode .accordion * {
+    color: #e4e4e4 !important;
+}
+
+body.dark-mode .accordion-header {
+    background-color: #0f4c75 !important;
+}
+
+body.dark-mode .accordion-header * {
+    color: #ffffff !important;
+}
+
+/* ===== IMAGES ===== */
+body.dark-mode img {
+    opacity: 0.9;
+}
+
+body.dark-mode img:hover {
+    opacity: 1;
+}
+
+/* ===== SCROLLBAR ===== */
+body.dark-mode ::-webkit-scrollbar {
+    width: 12px;
+    background-color: #1a1a2e;
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb {
+    background-color: #0f4c75;
+    border-radius: 6px;
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb:hover {
+    background-color: #3282b8;
+}
+
+/* ===== SECTIONS ===== */
+body.dark-mode .section,
+body.dark-mode .container {
+    background: transparent !important;
+}
+
+/* ===== HR ===== */
+body.dark-mode hr {
+    border-color: #2d3748 !important;
+}
+
+/* ===== TRANSITIONS ===== */
+body,
+.header,
+.navbar,
+.card,
+.product-card,
+input,
+select,
+textarea,
+button {
+    transition: background-color 0.3s ease, 
+                color 0.3s ease, 
+                border-color 0.3s ease !important;
+}
+
+/* ===== MOBILE RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .theme-toggle-btn,
+    .language-toggle-btn {
+        width: 45px !important;
+        height: 45px !important;
+        font-size: 1.1rem !important;
+        right: 15px !important;
+    }
+    
+    .language-toggle-btn {
+        bottom: 70px !important;
+        padding: 8px 12px !important;
+        font-size: 0.85rem !important;
+    }
+}
+
+/* ===== FOCUS & SELECTION ===== */
+body.dark-mode *:focus-visible {
+    outline: 2px solid #3282b8 !important;
+    outline-offset: 2px !important;
+}
+
+body.dark-mode ::selection {
+    background-color: #0f4c75 !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode ::-moz-selection {
+    background-color: #0f4c75 !important;
+    color: #ffffff !important;
+}
+
+/* ===== UNIVERSAL OVERRIDES - NUCLEAR OPTION ===== */
+body.dark-mode div[style*="background"],
+body.dark-mode span[style*="background"],
+body.dark-mode p[style*="background"] {
+    background-color: #16213e !important;
+}
+
+body.dark-mode div[style*="color"],
+body.dark-mode span[style*="color"],
+body.dark-mode p[style*="color"],
+body.dark-mode h1[style*="color"],
+body.dark-mode h2[style*="color"],
+body.dark-mode h3[style*="color"],
+body.dark-mode h4[style*="color"],
+body.dark-mode h5[style*="color"],
+body.dark-mode h6[style*="color"] {
+    color: #e4e4e4 !important;
+}
+
+/* Override các màu status cụ thể */
+body.dark-mode [style*="#f39c12"] {
+    color: #f1c40f !important;
+}
+
+body.dark-mode [style*="#3498db"] {
+    color: #5dade2 !important;
+}
+
+body.dark-mode [style*="#27ae60"] {
+    color: #52d787 !important;
+}
+
+body.dark-mode [style*="#e74c3c"] {
+    color: #ec7063 !important;
+}
+
+body.dark-mode [style*="#9b59b6"] {
+    color: #bb8fce !important;
+}
+
+/* Đảm bảo icons giữ màu */
+body.dark-mode .fa,
+body.dark-mode .fas,
+body.dark-mode .far,
+body.dark-mode .fab {
+    color: inherit !important;
+}
+
+body.dark-mode .fa-star {
+    color: #f1c40f !important;
+}
+
+/* ===== CRITICAL FIX FOR WHITE BACKGROUNDS ===== */
+body.dark-mode [style*="background:#fff"],
+body.dark-mode [style*="background: #fff"],
+body.dark-mode [style*="background:white"],
+body.dark-mode [style*="background: white"],
+body.dark-mode [style*="background-color:#fff"],
+body.dark-mode [style*="background-color: #fff"],
+body.dark-mode [style*="background-color:white"],
+body.dark-mode [style*="background-color: white"] {
+    background: #16213e !important;
+    background-color: #16213e !important;
+}

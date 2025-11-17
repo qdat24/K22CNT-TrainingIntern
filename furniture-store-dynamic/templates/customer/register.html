@@ -1,270 +1,1156 @@
 {% extends "base.html" %}
-{% block title %}Đăng Ký - Nội Thất ABC{% endblock %}
-
-{# Nếu base.html dùng block khác cho CSS/JS, đổi tên 'head'/'scripts' tương ứng #}
-{% block head %}
-  {{ super() }}
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-  <style>
-    /* ===== Reset nhẹ để chống xung đột CSS cũ ===== */
-    .auth-container *, .auth-container *::before, .auth-container *::after { box-sizing: border-box; }
-    .auth-container h1, .auth-container h2, .auth-container h3,
-    .auth-container p { margin: 0; }
-
-    /* ===== Layout ===== */
-    .auth-container{
-      min-height: calc(100vh - 120px);
-      display:grid; place-items:center;
-      padding: clamp(20px, 3.2vw, 48px);
-      background: #f6f8fb;
-    }
-    .auth-box{
-      width:min(720px, 100%);
-      background:#fff;
-      border:1px solid rgba(2,6,23,.06);
-      border-radius:16px;
-      box-shadow:0 12px 28px rgba(2,6,23,.08);
-      padding: clamp(24px, 3vw, 40px);
-    }
-
-    /* ===== Heading ===== */
-    .auth-title{
-      display:flex; align-items:center; gap:12px;
-      font-weight:800; font-size: clamp(22px, 2.6vw, 28px);
-      color:#1f2a37; letter-spacing:.2px;
-      margin-bottom:6px;
-    }
-    .auth-sub{ color:#6b7280; margin-bottom:18px; }
-
-    /* ===== Alerts (flash) ===== */
-    .alert{ display:flex; gap:10px; align-items:flex-start; padding:12px 14px;
-      border-radius:12px; margin:10px 0 16px; border:1px solid transparent; font-weight:600; }
-    .alert i{ margin-top:2px }
-    .alert-success{ background:#ecfdf5; color:#065f46; border-color:#a7f3d0 }
-    .alert-danger{  background:#fef2f2; color:#7f1d1d; border-color:#fecaca }
-    .alert-warning{ background:#fffbeb; color:#7c2d12; border-color:#fde68a }
-    .alert-info{    background:#eff6ff; color:#1e3a8a; border-color:#bfdbfe }
-
-    /* ===== Form ===== */
-    form{ margin-top:6px }
-    .form-group{ margin-bottom:16px; }
-    .form-group label{
-      display:block; font-weight:700; color:#1f2a37;
-      margin-bottom:8px; letter-spacing:.2px;
-    }
-    .form-group label i{ color:#64748b; width:18px; margin-right:6px }
-    .form-control{
-      width:100%; display:block;
-      padding:12px 14px;
-      border-radius:12px; border:1px solid #e5e7eb; background:#fff;
-      color:#111827; font:inherit; line-height:1.5;
-      transition: border-color .15s ease, box-shadow .15s ease;
-    }
-    .form-control::placeholder{ color:#9ca3af }
-    .form-control:focus{
-      outline:0; border-color:#2563eb; box-shadow:0 0 0 4px rgba(37,99,235,.15);
-    }
-    textarea.form-control{ resize:vertical; min-height:96px }
-
-    /* 2 cột đẹp trên màn rộng */
-    .grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:16px }
-    @media (max-width: 720px){ .grid-2{ grid-template-columns:1fr } }
-
-    /* Help & error text */
-    .help{ font-size:.9rem; color:#6b7280; margin-top:6px }
-    .error{ font-size:.9rem; color:#dc2626; margin-top:6px; display:none }
-
-    /* Password meter (đơn giản, không chiếm chỗ) */
-    .pw-meter{ display:flex; gap:6px; margin-top:8px }
-    .pw-bar{ height:8px; flex:1; border-radius:999px; background:#e5e7eb }
-    .pw-bar.active-1{ background:#fca5a5 }
-    .pw-bar.active-2{ background:#fdba74 }
-    .pw-bar.active-3{ background:#86efac }
-    .pw-bar.active-4{ background:#22c55e }
-
-    /* Toggle eye đặt trong dòng input bằng position relative của wrapper */
-    .input-wrap{ position:relative }
-    .btn-eye{
-      position:absolute; right:8px; top:50%; transform:translateY(-50%);
-      border:0; background:transparent; color:#64748b; cursor:pointer; padding:6px 8px;
-    }
-
-    /* Button submit */
-    .btn{
-      width:100%; display:inline-flex; align-items:center; justify-content:center; gap:10px;
-      padding:14px 16px; border-radius:12px; border:1px solid transparent;
-      font-weight:800; letter-spacing:.2px; cursor:pointer;
-      color:#fff; background:#16a34a;
-      box-shadow:0 12px 24px rgba(22,163,74,.18);
-      transition: filter .15s ease, transform .08s ease;
-    }
-    .btn:hover{ filter:brightness(.96) }
-    .btn:active{ transform: translateY(0) }
-
-    /* Links */
-    .auth-links{ margin-top:18px; text-align:center; color:#6b7280 }
-    .auth-links a{ color:#2563eb; font-weight:700; text-decoration:none }
-    .auth-links a:hover{ text-decoration:underline }
-
-    /* Dark mode hệ thống */
-    @media (prefers-color-scheme: dark){
-      .auth-container{ background:#0b1220 }
-      .auth-box{ background:#0f172a; border-color:#1f2937 }
-      .auth-title{ color:#e5e7eb } .auth-sub{ color:#94a3b8 }
-      .form-group label{ color:#e5e7eb }
-      .form-control{ background:#0b1220; border-color:#1f2937; color:#e5e7eb }
-      .form-control::placeholder{ color:#64748b }
-      .help{ color:#94a3b8 } .auth-links{ color:#94a3b8 }
-      .auth-links a{ color:#93c5fd }
-    }
-  </style>
-{% endblock %}
+{% block title %}Đăng Ký - HOMESTEAD{% endblock %}
 
 {% block content %}
-<div class="auth-container">
-  <div class="auth-box">
-    <h2 class="auth-title"><i class="fa-solid fa-user-plus"></i> Đăng Ký Tài Khoản</h2>
-    <p class="auth-sub">Tạo tài khoản để theo dõi đơn hàng, lưu sổ địa chỉ & nhận ưu đãi sớm nhất.</p>
-
-    {# Flash messages #}
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="alert alert-{{ category }}">
-            <i class="fas fa-{{ 'check-circle' if category == 'success' else ('exclamation-triangle' if category == 'warning' else ('circle-info' if category == 'info' else 'exclamation-circle')) }}"></i>
-            {{ message }}
-          </div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-
-    <form method="POST" action="{{ url_for('customer_register') }}" novalidate>
-      <div class="form-group">
-        <label for="full_name"><i class="fas fa-user"></i> Họ và tên <span style="color:#dc2626">*</span></label>
-        <input class="form-control" type="text" id="full_name" name="full_name" required placeholder="Nhập họ và tên">
-        <div class="error" id="err_full_name">Vui lòng nhập họ và tên.</div>
-      </div>
-
-      <div class="grid-2">
-        <div class="form-group">
-          <label for="email"><i class="fas fa-envelope"></i> Email <span style="color:#dc2626">*</span></label>
-          <input class="form-control" type="email" id="email" name="email" required placeholder="Nhập email">
-          <div class="error" id="err_email">Email không hợp lệ.</div>
-        </div>
-
-        <div class="form-group">
-          <label for="phone"><i class="fas fa-phone"></i> Số điện thoại</label>
-          <input class="form-control" type="tel" id="phone" name="phone" placeholder="Ví dụ: 09xxxxxxxx hoặc +84xxxxxxxxx">
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="address"><i class="fas fa-map-marker-alt"></i> Địa chỉ</label>
-        <textarea class="form-control" id="address" name="address" rows="3" placeholder="Nhập địa chỉ của bạn"></textarea>
-      </div>
-
-      <div class="grid-2">
-        <div class="form-group">
-          <label for="password"><i class="fas fa-lock"></i> Mật khẩu <span style="color:#dc2626">*</span></label>
-          <div class="input-wrap">
-            <input class="form-control" type="password" id="password" name="password" minlength="6" required placeholder="Tối thiểu 6 ký tự" autocomplete="new-password">
-            <button class="btn-eye" type="button" aria-label="Hiện/ẩn mật khẩu" data-target="password"><i class="fa-regular fa-eye"></i></button>
-          </div>
-          <div class="pw-meter" aria-hidden="true">
-            <span class="pw-bar" id="bar1"></span>
-            <span class="pw-bar" id="bar2"></span>
-            <span class="pw-bar" id="bar3"></span>
-            <span class="pw-bar" id="bar4"></span>
-          </div>
-          <div class="help">Mẹo: thêm chữ hoa, số, ký tự đặc biệt để mạnh hơn.</div>
-          <div class="error" id="err_password">Mật khẩu quá ngắn.</div>
-        </div>
-
-        <div class="form-group">
-          <label for="confirm_password"><i class="fas fa-lock"></i> Xác nhận mật khẩu <span style="color:#dc2626">*</span></label>
-          <div class="input-wrap">
-            <input class="form-control" type="password" id="confirm_password" name="confirm_password" minlength="6" required placeholder="Nhập lại mật khẩu" autocomplete="new-password">
-            <button class="btn-eye" type="button" aria-label="Hiện/ẩn mật khẩu" data-target="confirm_password"><i class="fa-regular fa-eye"></i></button>
-          </div>
-          <div class="error" id="err_confirm">Mật khẩu nhập lại chưa khớp.</div>
-        </div>
-      </div>
-
-      <button type="submit" class="btn">
-        <i class="fas fa-user-plus"></i> Tạo tài khoản
-      </button>
-    </form>
-
-    <div class="auth-links">
-      <p>Đã có tài khoản? <a href="{{ url_for('customer_login') }}">Đăng nhập ngay</a></p>
+<!-- Register Container -->
+<div class="auth-container-modern">
+    <!-- Decorative Background -->
+    <div class="auth-bg-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
     </div>
-  </div>
+
+    <div class="container">
+        <div class="auth-layout">
+            <!-- Left Side - Welcome Message -->
+            <div class="auth-welcome">
+                <div class="auth-welcome-content">
+                    <div class="welcome-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h1>Tham Gia Cùng Chúng Tôi</h1>
+                    <p>Tạo tài khoản để trải nghiệm mua sắm nội thất tuyệt vời và nhận nhiều ưu đãi độc quyền</p>
+                    
+                    <div class="welcome-features">
+                        <div class="welcome-feature">
+                            <div class="feature-icon">
+                                <i class="fas fa-percent"></i>
+                            </div>
+                            <div class="feature-text">
+                                <h4>Giảm Giá Đặc Biệt</h4>
+                                <p>Ưu đãi lên đến 20% cho thành viên mới</p>
+                            </div>
+                        </div>
+                        <div class="welcome-feature">
+                            <div class="feature-icon">
+                                <i class="fas fa-bell"></i>
+                            </div>
+                            <div class="feature-text">
+                                <h4>Thông Báo Sớm</h4>
+                                <p>Cập nhật sản phẩm mới trước tiên</p>
+                            </div>
+                        </div>
+                        <div class="welcome-feature">
+                            <div class="feature-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="feature-text">
+                                <h4>Tích Điểm Thưởng</h4>
+                                <p>Nhận điểm với mỗi đơn hàng</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side - Register Form -->
+            <div class="auth-form-wrapper">
+                <div class="auth-form-card">
+                    <!-- Header -->
+                    <div class="auth-header">
+                        <h2 class="auth-title">
+                            <i class="fas fa-user-plus"></i>
+                            Đăng Ký
+                        </h2>
+                        <p class="auth-subtitle">Tạo tài khoản mới để bắt đầu mua sắm</p>
+                    </div>
+
+                    <!-- Flash Messages -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                            <div class="alert-modern alert-{{ category }}" data-aos="fade-down">
+                                <div class="alert-icon">
+                                    <i class="fas fa-{{ 'check-circle' if category == 'success' else ('exclamation-triangle' if category == 'warning' else ('circle-info' if category == 'info' else 'exclamation-circle')) }}"></i>
+                                </div>
+                                <div class="alert-content">
+                                    <div class="alert-message">{{ message }}</div>
+                                </div>
+                                <button class="alert-close" onclick="this.parentElement.remove()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <!-- Register Form -->
+                    <form method="POST" action="{{ url_for('customer_register') }}" class="auth-form" novalidate>
+                        <!-- Full Name -->
+                        <div class="form-group-modern">
+                            <label for="name" class="form-label-modern">
+                                <i class="fas fa-user"></i>
+                                Họ và Tên
+                            </label>
+                            <div class="input-group-modern">
+                                <span class="input-icon">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                                <input 
+                                    type="text" 
+                                    id="name" 
+                                    name="name" 
+                                    class="form-input-modern" 
+                                    placeholder="Nguyễn Văn A"
+                                    required
+                                    autocomplete="name">
+                            </div>
+                        </div>
+
+                        <!-- Email Field -->
+                        <div class="form-group-modern">
+                            <label for="email" class="form-label-modern">
+                                <i class="fas fa-envelope"></i>
+                                Địa chỉ Email
+                            </label>
+                            <div class="input-group-modern">
+                                <span class="input-icon">
+                                    <i class="fas fa-envelope"></i>
+                                </span>
+                                <input 
+                                    type="email" 
+                                    id="email" 
+                                    name="email" 
+                                    class="form-input-modern" 
+                                    placeholder="example@email.com"
+                                    required
+                                    autocomplete="email">
+                            </div>
+                        </div>
+
+                        <!-- Phone Number -->
+                        <div class="form-group-modern">
+                            <label for="phone" class="form-label-modern">
+                                <i class="fas fa-phone"></i>
+                                Số Điện Thoại
+                            </label>
+                            <div class="input-group-modern">
+                                <span class="input-icon">
+                                    <i class="fas fa-phone"></i>
+                                </span>
+                                <input 
+                                    type="tel" 
+                                    id="phone" 
+                                    name="phone" 
+                                    class="form-input-modern" 
+                                    placeholder="0912345678"
+                                    autocomplete="tel">
+                            </div>
+                        </div>
+
+                        <!-- Password Field -->
+                        <div class="form-group-modern">
+                            <label for="password" class="form-label-modern">
+                                <i class="fas fa-lock"></i>
+                                Mật Khẩu
+                            </label>
+                            <div class="input-group-modern">
+                                <span class="input-icon">
+                                    <i class="fas fa-lock"></i>
+                                </span>
+                                <input 
+                                    type="password" 
+                                    id="password" 
+                                    name="password" 
+                                    class="form-input-modern" 
+                                    placeholder="••••••••"
+                                    required
+                                    autocomplete="new-password"
+                                    minlength="8">
+                                <button type="button" class="toggle-password" data-target="password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="form-hint">
+                                <i class="fas fa-info-circle"></i>
+                                Mật khẩu tối thiểu 8 ký tự
+                            </div>
+                            <div class="password-strength">
+                                <div class="password-strength-bar"></div>
+                            </div>
+                        </div>
+
+                        <!-- Confirm Password -->
+                        <div class="form-group-modern">
+                            <label for="confirm_password" class="form-label-modern">
+                                <i class="fas fa-lock"></i>
+                                Xác Nhận Mật Khẩu
+                            </label>
+                            <div class="input-group-modern">
+                                <span class="input-icon">
+                                    <i class="fas fa-lock"></i>
+                                </span>
+                                <input 
+                                    type="password" 
+                                    id="confirm_password" 
+                                    name="confirm_password" 
+                                    class="form-input-modern" 
+                                    placeholder="••••••••"
+                                    required
+                                    autocomplete="new-password">
+                                <button type="button" class="toggle-password" data-target="confirm_password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Terms Agreement -->
+                        <div class="terms-agreement">
+                            <label class="checkbox-modern">
+                                <input type="checkbox" id="terms" name="terms" required>
+                                <span class="checkbox-custom"></span>
+                                <span class="checkbox-label">
+                                    Tôi đồng ý với 
+                                    <a href="#" class="link-modern">Điều khoản dịch vụ</a> 
+                                    và 
+                                    <a href="#" class="link-modern">Chính sách bảo mật</a>
+                                </span>
+                            </label>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-lg submit-btn">
+                            <span class="btn-text">
+                                <i class="fas fa-user-plus"></i>
+                                Tạo Tài Khoản
+                            </span>
+                            <span class="btn-loading">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                Đang xử lý...
+                            </span>
+                        </button>
+
+                        <!-- Divider -->
+                        <div class="divider-modern">
+                            <span>Hoặc đăng ký với</span>
+                        </div>
+
+                        <!-- Social Register -->
+                        <div class="social-login">
+                            <button type="button" class="social-btn google-btn">
+                                <i class="fab fa-google"></i>
+                                Google
+                            </button>
+                            <button type="button" class="social-btn facebook-btn">
+                                <i class="fab fa-facebook-f"></i>
+                                Facebook
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Login Link -->
+                    <div class="auth-footer">
+                        <p>
+                            Đã có tài khoản? 
+                            <a href="{{ url_for('customer_login') }}" class="link-modern link-bold">
+                                Đăng nhập ngay
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Trust Badges -->
+                <div class="trust-badges-auth">
+                    <div class="trust-item">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Bảo mật SSL</span>
+                    </div>
+                    <div class="trust-item">
+                        <i class="fas fa-lock"></i>
+                        <span>Thông tin an toàn</span>
+                    </div>
+                    <div class="trust-item">
+                        <i class="fas fa-user-check"></i>
+                        <span>Miễn phí mãi mãi</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-{% endblock %}
 
-{% block scripts %}
-  {{ super() }}
-  <script>
-    // Toggle hiện/ẩn mật khẩu
-    document.querySelectorAll('.btn-eye').forEach(btn=>{
-      btn.addEventListener('click', ()=>{
-        const id = btn.getAttribute('data-target');
-        const input = document.getElementById(id);
-        const icon = btn.querySelector('i');
-        if(input.type === 'password'){ input.type='text'; icon.classList.replace('fa-eye','fa-eye-slash'); }
-        else { input.type='password'; icon.classList.replace('fa-eye-slash','fa-eye'); }
-      });
-    });
-
-    // Meter đơn giản
-    const pwd = document.getElementById('password');
-    const bars = ['bar1','bar2','bar3','bar4'].map(id=>document.getElementById(id));
-    function strength(p){
-      let s=0; if(!p) return 0;
-      if(p.length>=6) s++; if(/[A-Z]/.test(p)) s++; if(/\d/.test(p)) s++; if(/\W/.test(p)) s++;
-      if(p.length>=12 && s>=3) s=4; return s;
+<!-- Styles -->
+<style>
+    /* ===== Auth Container ===== */
+    .auth-container-modern {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 0;
+        background: linear-gradient(135deg, var(--bg-beige) 0%, #f5f1e8 50%, var(--sage-light) 100%);
+        position: relative;
+        overflow: hidden;
     }
-    function render(s){
-      bars.forEach(b=>{ b.className='pw-bar'; });
-      for(let i=0;i<s;i++){ bars[i].classList.add(`active-${s}`); }
+
+    /* Decorative Shapes */
+    .auth-bg-shapes {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        pointer-events: none;
+        z-index: 0;
     }
-    pwd && pwd.addEventListener('input', e=>{
-      const v=e.target.value; render(strength(v));
-      document.getElementById('err_password').style.display = v.length>=6 ? 'none':'block';
-      checkConfirm();
-    });
 
-    // Xác nhận khớp
-    const confirmEl = document.getElementById('confirm_password');
-    function checkConfirm(){
-      const ok = confirmEl.value==='' || (pwd.value===confirmEl.value);
-      document.getElementById('err_confirm').style.display = ok ? 'none':'block';
-      return ok;
+    .shape {
+        position: absolute;
+        border-radius: 50%;
+        opacity: 0.1;
+        animation: float 20s ease-in-out infinite;
     }
-    confirmEl && confirmEl.addEventListener('input', checkConfirm);
 
-    // Email & Họ tên cơ bản
-    const emailEl = document.getElementById('email');
-    emailEl && emailEl.addEventListener('input', ()=>{
-      const valid=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailEl.value);
-      document.getElementById('err_email').style.display = (emailEl.value==='' || valid) ? 'none':'block';
-    });
-    const fullNameEl = document.getElementById('full_name');
-    fullNameEl && fullNameEl.addEventListener('input', ()=>{
-      document.getElementById('err_full_name').style.display = fullNameEl.value.trim()? 'none':'block';
+    .shape-1 {
+        width: 400px;
+        height: 400px;
+        background: var(--gradient-sage);
+        top: -200px;
+        right: -100px;
+        animation-delay: 0s;
+    }
+
+    .shape-2 {
+        width: 300px;
+        height: 300px;
+        background: var(--gradient-wood);
+        bottom: -150px;
+        left: -100px;
+        animation-delay: 5s;
+    }
+
+    .shape-3 {
+        width: 200px;
+        height: 200px;
+        background: var(--gradient-terracotta);
+        top: 50%;
+        left: 10%;
+        animation-delay: 10s;
+    }
+
+    @keyframes float {
+        0%, 100% {
+            transform: translate(0, 0) rotate(0deg);
+        }
+        33% {
+            transform: translate(30px, -30px) rotate(120deg);
+        }
+        66% {
+            transform: translate(-20px, 20px) rotate(240deg);
+        }
+    }
+
+    /* ===== Auth Layout ===== */
+    .auth-layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+        max-width: 1200px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* ===== Welcome Section ===== */
+    .auth-welcome {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+    }
+
+    .auth-welcome-content {
+        max-width: 500px;
+    }
+
+    .welcome-icon {
+        width: 80px;
+        height: 80px;
+        background: var(--gradient-sage);
+        border-radius: var(--radius-xl);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 2rem;
+        animation: pulse 2s ease-in-out infinite;
+    }
+
+    .welcome-icon i {
+        font-size: 2.5rem;
+        color: white;
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+            box-shadow: 0 0 0 0 rgba(157, 184, 146, 0.7);
+        }
+        50% {
+            transform: scale(1.05);
+            box-shadow: 0 0 0 20px rgba(157, 184, 146, 0);
+        }
+    }
+
+    .auth-welcome h1 {
+        font-size: 2.75rem;
+        font-weight: 800;
+        color: var(--text-dark);
+        margin-bottom: 1rem;
+        line-height: 1.2;
+    }
+
+    .auth-welcome > p {
+        font-size: 1.125rem;
+        color: var(--text-medium);
+        margin-bottom: 3rem;
+        line-height: 1.6;
+    }
+
+    .welcome-features {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .welcome-feature {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1.25rem;
+        background: white;
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-sm);
+        transition: all var(--transition-normal);
+    }
+
+    .welcome-feature:hover {
+        transform: translateX(10px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .feature-icon {
+        width: 50px;
+        height: 50px;
+        background: var(--sage-light);
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .feature-icon i {
+        font-size: 1.5rem;
+        color: var(--sage-dark);
+    }
+
+    .feature-text h4 {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 0.25rem;
+    }
+
+    .feature-text p {
+        font-size: 0.9375rem;
+        color: var(--text-medium);
+    }
+
+    /* ===== Form Card ===== */
+    .auth-form-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .auth-form-card {
+        background: white;
+        border-radius: var(--radius-2xl);
+        padding: 2.5rem;
+        box-shadow: var(--shadow-xl);
+        animation: slideInRight 0.6s ease-out;
+    }
+
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    /* ===== Header ===== */
+    .auth-header {
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .auth-title {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
+    }
+
+    .auth-title i {
+        color: var(--sage-medium);
+    }
+
+    .auth-subtitle {
+        font-size: 1rem;
+        color: var(--text-medium);
+        line-height: 1.5;
+    }
+
+    /* ===== Alerts ===== */
+    .alert-modern {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1rem 1.25rem;
+        border-radius: var(--radius-xl);
+        margin-bottom: 1.5rem;
+        border: 2px solid;
+        animation: slideDown 0.3s ease-out;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .alert-modern .alert-icon {
+        flex-shrink: 0;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .alert-modern .alert-icon i {
+        font-size: 1.25rem;
+    }
+
+    .alert-content {
+        flex: 1;
+    }
+
+    .alert-message {
+        font-weight: 600;
+        line-height: 1.5;
+    }
+
+    .alert-close {
+        flex-shrink: 0;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 0.25rem;
+        opacity: 0.5;
+        transition: opacity var(--transition-fast);
+    }
+
+    .alert-close:hover {
+        opacity: 1;
+    }
+
+    .alert-success {
+        background: #ecfdf5;
+        border-color: #10b981;
+        color: #065f46;
+    }
+
+    .alert-danger {
+        background: #fef2f2;
+        border-color: #ef4444;
+        color: #991b1b;
+    }
+
+    .alert-warning {
+        background: #fffbeb;
+        border-color: #f59e0b;
+        color: #92400e;
+    }
+
+    .alert-info {
+        background: #eff6ff;
+        border-color: #3b82f6;
+        color: #1e40af;
+    }
+
+    /* ===== Form Groups ===== */
+    .form-group-modern {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label-modern {
+        display: block;
+        font-weight: 700;
+        font-size: 0.9375rem;
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-label-modern i {
+        color: var(--sage-medium);
+        width: 16px;
+    }
+
+    .input-group-modern {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 1rem;
+        color: var(--text-light);
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .form-input-modern {
+        width: 100%;
+        padding: 0.875rem 1rem 0.875rem 3rem;
+        border: 2px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        font-size: 1rem;
+        color: var(--text-dark);
+        background: white;
+        transition: all var(--transition-normal);
+    }
+
+    .form-input-modern::placeholder {
+        color: var(--text-light);
+    }
+
+    .form-input-modern:focus {
+        outline: none;
+        border-color: var(--sage-medium);
+        box-shadow: 0 0 0 4px rgba(157, 184, 146, 0.15);
+    }
+
+    .toggle-password {
+        position: absolute;
+        right: 1rem;
+        background: transparent;
+        border: none;
+        color: var(--text-light);
+        cursor: pointer;
+        padding: 0.5rem;
+        transition: color var(--transition-fast);
+    }
+
+    .toggle-password:hover {
+        color: var(--sage-medium);
+    }
+
+    /* ===== Form Hints ===== */
+    .form-hint {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+        font-size: 0.875rem;
+        color: var(--text-light);
+    }
+
+    .form-hint i {
+        font-size: 0.875rem;
+    }
+
+    /* ===== Password Strength ===== */
+    .password-strength {
+        margin-top: 0.5rem;
+        height: 4px;
+        background: var(--border-color);
+        border-radius: var(--radius-full);
+        overflow: hidden;
+    }
+
+    .password-strength-bar {
+        height: 100%;
+        width: 0;
+        transition: all var(--transition-normal);
+        border-radius: var(--radius-full);
+    }
+
+    .password-strength-bar.weak {
+        width: 33%;
+        background: #ef4444;
+    }
+
+    .password-strength-bar.medium {
+        width: 66%;
+        background: #f59e0b;
+    }
+
+    .password-strength-bar.strong {
+        width: 100%;
+        background: #10b981;
+    }
+
+    /* ===== Terms Agreement ===== */
+    .terms-agreement {
+        margin-bottom: 1.5rem;
+    }
+
+    .terms-agreement .checkbox-label {
+        line-height: 1.5;
+    }
+
+    .terms-agreement .link-modern {
+        display: inline;
+    }
+
+    /* ===== Auth Options ===== */
+    .auth-options {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+        gap: 1rem;
+    }
+
+    .checkbox-modern {
+        display: flex;
+        align-items: center;
+        gap: 0.625rem;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .checkbox-modern input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .checkbox-custom {
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--border-color);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all var(--transition-fast);
+        position: relative;
+    }
+
+    .checkbox-custom::after {
+        content: '';
+        position: absolute;
+        width: 6px;
+        height: 10px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg) scale(0);
+        transition: transform var(--transition-fast);
+    }
+
+    .checkbox-modern input:checked ~ .checkbox-custom {
+        background: var(--gradient-sage);
+        border-color: var(--sage-medium);
+    }
+
+    .checkbox-modern input:checked ~ .checkbox-custom::after {
+        transform: rotate(45deg) scale(1);
+    }
+
+    .checkbox-label {
+        font-size: 0.9375rem;
+        font-weight: 600;
+        color: var(--text-medium);
+    }
+
+    .link-modern {
+        color: var(--sage-medium);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9375rem;
+        transition: color var(--transition-fast);
+    }
+
+    .link-modern:hover {
+        color: var(--sage-dark);
+        text-decoration: underline;
+    }
+
+    .link-bold {
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+    }
+
+    .link-bold i {
+        transition: transform var(--transition-fast);
+    }
+
+    .link-bold:hover i {
+        transform: translateX(4px);
+    }
+
+    /* ===== Submit Button ===== */
+    .submit-btn {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .submit-btn .btn-loading {
+        display: none;
+    }
+
+    .submit-btn.loading .btn-text {
+        display: none;
+    }
+
+    .submit-btn.loading .btn-loading {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    /* ===== Divider ===== */
+    .divider-modern {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        margin: 2rem 0;
+        color: var(--text-light);
+        font-size: 0.9375rem;
+        font-weight: 600;
+    }
+
+    .divider-modern::before,
+    .divider-modern::after {
+        content: '';
+        flex: 1;
+        border-bottom: 2px solid var(--border-color);
+    }
+
+    .divider-modern span {
+        padding: 0 1rem;
+    }
+
+    /* ===== Social Login ===== */
+    .social-login {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .social-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.625rem;
+        padding: 0.875rem;
+        border: 2px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        background: white;
+        font-weight: 700;
+        font-size: 0.9375rem;
+        cursor: pointer;
+        transition: all var(--transition-normal);
+    }
+
+    .social-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .google-btn {
+        color: #ea4335;
+    }
+
+    .google-btn:hover {
+        background: #ea4335;
+        color: white;
+        border-color: #ea4335;
+    }
+
+    .facebook-btn {
+        color: #1877f2;
+    }
+
+    .facebook-btn:hover {
+        background: #1877f2;
+        color: white;
+        border-color: #1877f2;
+    }
+
+    /* ===== Footer ===== */
+    .auth-footer {
+        text-align: center;
+        padding-top: 1.5rem;
+        border-top: 2px solid var(--border-color);
+    }
+
+    .auth-footer p {
+        font-size: 1rem;
+        color: var(--text-medium);
+    }
+
+    /* ===== Trust Badges ===== */
+    .trust-badges-auth {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 2rem;
+        padding: 1rem;
+        background: white;
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .trust-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--text-medium);
+    }
+
+    .trust-item i {
+        color: var(--sage-medium);
+        font-size: 1rem;
+    }
+
+    /* ===== Dark Mode ===== */
+    body.dark-mode .auth-container-modern {
+        background: linear-gradient(135deg, var(--dark-bg-primary) 0%, var(--dark-bg-secondary) 50%, #1a1410 100%);
+    }
+
+    body.dark-mode .auth-form-card,
+    body.dark-mode .welcome-feature,
+    body.dark-mode .trust-badges-auth {
+        background: var(--dark-bg-card);
+        border: 1px solid var(--dark-border);
+    }
+
+    body.dark-mode .auth-title,
+    body.dark-mode .auth-welcome h1,
+    body.dark-mode .feature-text h4,
+    body.dark-mode .form-label-modern {
+        color: var(--dark-text-primary);
+    }
+
+    body.dark-mode .auth-subtitle,
+    body.dark-mode .auth-welcome > p,
+    body.dark-mode .feature-text p,
+    body.dark-mode .checkbox-label,
+    body.dark-mode .auth-footer p,
+    body.dark-mode .trust-item {
+        color: var(--dark-text-secondary);
+    }
+
+    body.dark-mode .form-input-modern {
+        background: var(--dark-bg-elevated);
+        border-color: var(--dark-border);
+        color: var(--dark-text-primary);
+    }
+
+    body.dark-mode .social-btn {
+        background: var(--dark-bg-elevated);
+        border-color: var(--dark-border);
+    }
+
+    body.dark-mode .welcome-icon {
+        background: linear-gradient(135deg, var(--dark-sage), var(--dark-sage-dark));
+    }
+
+    body.dark-mode .feature-icon {
+        background: rgba(157, 184, 146, 0.15);
+    }
+
+    body.dark-mode .feature-icon i {
+        color: var(--dark-sage-light);
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 1024px) {
+        .auth-layout {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .auth-welcome {
+            display: none;
+        }
+
+        .auth-form-card {
+            max-width: 500px;
+            margin: 0 auto;
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .auth-container-modern {
+            padding: 1rem 0;
+        }
+
+        .auth-form-card {
+            padding: 1.5rem;
+        }
+
+        .auth-title {
+            font-size: 1.75rem;
+        }
+
+        .auth-welcome h1 {
+            font-size: 2rem;
+        }
+
+        .social-login {
+            grid-template-columns: 1fr;
+        }
+
+        .trust-badges-auth {
+            flex-direction: column;
+            gap: 1rem;
+        }
+    }
+</style>
+
+<!-- Scripts -->
+<script>
+    // Toggle password visibility
+    document.querySelectorAll('.toggle-password').forEach(button => {
+        button.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target');
+            const input = document.getElementById(targetId);
+            const icon = this.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
     });
 
-    // Chặn submit nếu lỗi
-    const form=document.querySelector('.auth-box form');
-    form && form.addEventListener('submit', (e)=>{
-      let ok=true;
-      if(!fullNameEl.value.trim()){ document.getElementById('err_full_name').style.display='block'; ok=false; }
-      if(pwd.value.length<6){ document.getElementById('err_password').style.display='block'; ok=false; }
-      if(!checkConfirm()) ok=false;
-      const valid=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailEl.value);
-      if(!valid){ document.getElementById('err_email').style.display='block'; ok=false; }
-      if(!ok) e.preventDefault();
+    // Password strength indicator
+    const passwordInput = document.getElementById('password');
+    const strengthBar = document.querySelector('.password-strength-bar');
+    
+    if (passwordInput && strengthBar) {
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            let strength = 0;
+            
+            if (password.length >= 8) strength++;
+            if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+            if (/\d/.test(password)) strength++;
+            if (/[^a-zA-Z\d]/.test(password)) strength++;
+            
+            strengthBar.className = 'password-strength-bar';
+            if (strength <= 2) {
+                strengthBar.classList.add('weak');
+            } else if (strength === 3) {
+                strengthBar.classList.add('medium');
+            } else {
+                strengthBar.classList.add('strong');
+            }
+        });
+    }
+
+    // Form submission with loading state
+    document.querySelector('.auth-form').addEventListener('submit', function(e) {
+        const submitBtn = this.querySelector('.submit-btn');
+        
+        // Validate passwords match
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirm_password').value;
+        
+        if (password !== confirmPassword) {
+            e.preventDefault();
+            alert('Mật khẩu xác nhận không khớp!');
+            return false;
+        }
+        
+        // Validate terms
+        const terms = document.getElementById('terms');
+        if (!terms.checked) {
+            e.preventDefault();
+            alert('Vui lòng đồng ý với điều khoản dịch vụ!');
+            return false;
+        }
+        
+        submitBtn.classList.add('loading');
+        submitBtn.disabled = true;
+        
+        setTimeout(() => {
+            submitBtn.classList.remove('loading');
+            submitBtn.disabled = false;
+        }, 5000);
     });
-  </script>
+
+    // Auto-dismiss alerts
+    document.querySelectorAll('.alert-modern').forEach(alert => {
+        setTimeout(() => {
+            alert.style.animation = 'slideUp 0.3s ease-out forwards';
+            setTimeout(() => alert.remove(), 300);
+        }, 5000);
+    });
+
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideUp {
+            to {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+        }
+    `;
+    document.head.appendChild(style);
+
+    // Social register
+    document.querySelectorAll('.social-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const platform = this.classList.contains('google-btn') ? 'Google' : 'Facebook';
+            alert(`Đăng ký với ${platform} đang được phát triển`);
+        });
+    });
+</script>
+
 {% endblock %}

@@ -195,3 +195,86 @@ INSERT INTO products (name, category, price, original_price, image, description,
 ('Ghế Thư Giãn Bọc Da', 'Phòng Khách', 9800000, 12000000, 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=800',
  'Ghế thư giãn ergonomic, điều chỉnh được góc ngả thoải mái.',
  'Da PU cao cấp|Điều chỉnh góc ngả|Gác chân tích hợp|Khung thép chắc chắn', 4.8, 98);
+DELETE FROM admin_users WHERE username = 'admin';
+INSERT INTO admin_users (username, password, full_name, email) 
+VALUES ('admin', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYNq.4OdFG6', 'Administrator', 'admin@furniture.com');
+SELECT * FROM admin_users WHERE username = 'admin';
+-- Xóa admin cũ
+DELETE FROM furniture_store.admin_users WHERE username = 'admin';
+
+-- Tạo admin mới với password đã được hash sẵn
+INSERT INTO furniture_store.admin_users 
+(username, password, full_name, email, is_active, created_at, updated_at)
+VALUES (
+    'admin',
+    '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYNq.4OdFG6',
+    'Administrator',
+    'admin@furniture.com',
+    1,
+    NOW(),
+    NOW()
+);
+
+-- Kiểm tra
+SELECT * FROM furniture_store.admin_users WHERE username = 'admin';
+USE furniture_store;
+SELECT * FROM products;
+INSERT INTO site_settings (setting_key, setting_value, description) VALUES
+('contact_facebook', 'https://facebook.com/yourpage', 'Link Facebook'),
+('contact_zalo', '0901234567', 'Số Zalo'),
+('contact_whatsapp', '84901234567', 'Số WhatsApp');
+USE furniture_store;
+
+-- Tạo bảng lưu tin nhắn liên hệ
+CREATE TABLE IF NOT EXISTS contacts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    phone VARCHAR(20),
+    subject VARCHAR(255) NOT NULL,
+    message TEXT NOT NULL,
+    status VARCHAR(50) DEFAULT 'new',
+    replied BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_status (status),
+    INDEX idx_created_at (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+-- ============================================
+-- SETUP DATABASE CHO QUẢN LÝ KHÁCH HÀNG
+-- ============================================
+
+-- 1. Tạo bảng customers nếu chưa có
+CREATE TABLE IF NOT EXISTS customers (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL COMMENT 'Mật khẩu đã mã hóa bằng bcrypt',
+    full_name VARCHAR(255) NOT NULL,
+    phone VARCHAR(20),
+    address TEXT,
+    is_active BOOLEAN DEFAULT TRUE COMMENT 'TRUE = hoạt động, FALSE = bị khóa',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    last_login TIMESTAMP NULL COMMENT 'Lần đăng nhập gần nhất',
+    
+    -- Indexes để tăng tốc truy vấn
+    INDEX idx_email (email),
+    INDEX idx_is_active (is_active),
+    INDEX idx_created_at (created_at),
+    INDEX idx_full_name (full_name)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 2. Insert một số khách hàng demo
+-- Password mặc định: password123
+INSERT IGNORE INTO customers (email, password, full_name, phone, address, is_active) VALUES
+    ('customer1@example.com', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5eTnB7hV9VqJm', 'Nguyễn Văn A', '0901234567', '123 Đường ABC, Q.1, TP.HCM', TRUE),
+    ('customer2@example.com', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5eTnB7hV9VqJm', 'Trần Thị B', '0902345678', '456 Đường XYZ, Q.2, TP.HCM', TRUE),
+    ('customer3@example.com', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5eTnB7hV9VqJm', 'Lê Văn C', '0903456789', '789 Đường DEF, Q.3, TP.HCM', TRUE),
+    ('customer4@example.com', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5eTnB7hV9VqJm', 'Phạm Thị D', '0904567890', '321 Đường GHI, Q.4, TP.HCM', FALSE),
+    ('customer5@example.com', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5eTnB7hV9VqJm', 'Hoàng Văn E', '0905678901', '654 Đường JKL, Q.5, TP.HCM', TRUE);
+
+-- 3. Kiểm tra dữ liệu
+SELECT 
+    COUNT(*) as total_customers,
+    SUM(CASE WHEN is_active = TRUE THEN 1 ELSE 0 END) as active_customers,
+    SUM(CASE WHEN is_active = FALSE THEN 1 ELSE 0 END) as inactive_customers
+FROM customers;
