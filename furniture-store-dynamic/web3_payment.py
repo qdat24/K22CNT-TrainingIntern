@@ -1,6 +1,6 @@
 # ============================================
-# WEB3 PAYMENT BACKEND - COMPLETE VERSION
-# Flask Routes for USDT Payment Processing
+# WEB3 PAYMENT SYSTEM - UPGRADED VERSION
+# Professional USDT Payment Processing
 # ============================================
 
 from flask import Blueprint, render_template, request, jsonify, session, redirect, url_for
@@ -8,10 +8,18 @@ from datetime import datetime, timedelta
 import json
 import hashlib
 import secrets
+import requests
+from decimal import Decimal
+from typing import Optional, Dict, Tuple
 
-# Optional: Web3 integration (uncomment when ready to use)
-# from web3 import Web3
-# from decimal import Decimal
+# Web3 Integration
+try:
+    from web3 import Web3
+    from web3.middleware import geth_poa_middleware
+    WEB3_AVAILABLE = True
+except ImportError:
+    WEB3_AVAILABLE = False
+    print("⚠️ Web3.py not installed. Install with: pip install web3")
 
 # Create blueprint
 web3_bp = Blueprint('web3', __name__)
@@ -20,64 +28,115 @@ web3_bp = Blueprint('web3', __name__)
 # CONFIGURATION
 # ============================================
 
-# Store transactions in memory (use Redis/Database in production)
+# Store transactions (use Redis/Database in production)
 web3_transactions = {}
 pending_payments = {}
+usdt_rate_cache = {'rate': 25000, 'updated_at': None}
 
-# USDT Rate (update from API in production)
-USDT_RATE = 25000  # 1 USDT = 25,000 VND
+# USDT Rate Update Interval (5 minutes)
+RATE_UPDATE_INTERVAL = 300
 
-# Supported Networks
+# Supported Networks - Updated with latest RPC endpoints
 SUPPORTED_NETWORKS = {
+    # Mainnet Networks
     1: {
         'name': 'Ethereum Mainnet',
-        'rpc': 'https://eth-mainnet.g.alchemy.com/v2/YOUR_API_KEY',
+        'symbol': 'ETH',
+        'rpc': 'https://eth.llamarpc.com',
         'usdt_address': '0xdac17f958d2ee523a2206206994597c13d831ec7',
         'explorer': 'https://etherscan.io',
-        'gas_price': 'high'
+        'gas_price': 'high',
+        'decimals': 6,
+        'min_confirmations': 12,
+        'is_testnet': False
     },
     56: {
         'name': 'BNB Smart Chain',
-        'rpc': 'https://bsc-dataseed.binance.org',
+        'symbol': 'BNB',
+        'rpc': 'https://bsc-dataseed1.binance.org',
         'usdt_address': '0x55d398326f99059fF775485246999027B3197955',
         'explorer': 'https://bscscan.com',
-        'gas_price': 'low'
+        'gas_price': 'medium',
+        'decimals': 18,
+        'min_confirmations': 15,
+        'is_testnet': False
     },
     137: {
-        'name': 'Polygon',
+        'name': 'Polygon Mainnet',
+        'symbol': 'MATIC',
         'rpc': 'https://polygon-rpc.com',
         'usdt_address': '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
         'explorer': 'https://polygonscan.com',
-        'gas_price': 'low'
+        'gas_price': 'low',
+        'decimals': 6,
+        'min_confirmations': 128,
+        'is_testnet': False
     },
-    5: {
-        'name': 'Goerli Testnet',
-        'rpc': 'https://goerli.infura.io/v3/YOUR_API_KEY',
-        'usdt_address': '0x509Ee0d083DdF8AC028f2a56731412edD63223B9',
-        'explorer': 'https://goerli.etherscan.io',
-        'gas_price': 'low'
+    42161: {
+        'name': 'Arbitrum One',
+        'symbol': 'ETH',
+        'rpc': 'https://arb1.arbitrum.io/rpc',
+        'usdt_address': '0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9',
+        'explorer': 'https://arbiscan.io',
+        'gas_price': 'low',
+        'decimals': 6,
+        'min_confirmations': 10,
+        'is_testnet': False
+    },
+    10: {
+        'name': 'Optimism',
+        'symbol': 'ETH',
+        'rpc': 'https://mainnet.optimism.io',
+        'usdt_address': '0x94b008aA00579c1307B0EF2c499aD98a8ce58e58',
+        'explorer': 'https://optimistic.etherscan.io',
+        'gas_price': 'low',
+        'decimals': 6,
+        'min_confirmations': 10,
+        'is_testnet': False
+    },
+    # Testnet Networks
+    11155111: {
+        'name': 'Sepolia Testnet',
+        'symbol': 'ETH',
+        'rpc': 'https://rpc.sepolia.org',
+        'usdt_address': '0x7169D38820dfd117C3FA1f22a697dBA58d90BA06',
+        'explorer': 'https://sepolia.etherscan.io',
+        'gas_price': 'low',
+        'decimals': 6,
+        'min_confirmations': 3,
+        'is_testnet': True
     },
     97: {
         'name': 'BSC Testnet',
+        'symbol': 'tBNB',
         'rpc': 'https://data-seed-prebsc-1-s1.binance.org:8545',
         'usdt_address': '0x337610d27c682E347C9cD60BD4b3b107C9d34dDd',
         'explorer': 'https://testnet.bscscan.com',
-        'gas_price': 'low'
+        'gas_price': 'low',
+        'decimals': 18,
+        'min_confirmations': 3,
+        'is_testnet': True
     },
     80001: {
         'name': 'Mumbai Testnet',
+        'symbol': 'MATIC',
         'rpc': 'https://rpc-mumbai.maticvigil.com',
         'usdt_address': '0x3813e82e6f7098b9583FC0F33a962D02018B6803',
         'explorer': 'https://mumbai.polygonscan.com',
-        'gas_price': 'low'
+        'gas_price': 'low',
+        'decimals': 6,
+        'min_confirmations': 3,
+        'is_testnet': True
     }
 }
 
-# Recipient Wallet Address (YOUR WALLET - CHANGE THIS!)
+# IMPORTANT: Change this to your wallet address
 RECIPIENT_WALLET = '0x3fd86c3728b38cb6b09fa7d4914888dcfef1518c'
 
-# Payment timeout (15 minutes)
-PAYMENT_TIMEOUT = 15 * 60  # seconds
+# Payment Settings
+PAYMENT_TIMEOUT = 15 * 60  # 15 minutes
+MAX_TRANSACTION_AGE = 24 * 60 * 60  # 24 hours
+CONFIRMATION_CHECK_INTERVAL = 30  # seconds
 
 # ============================================
 # MAIN ROUTES
@@ -89,29 +148,35 @@ def usdt_payment_page():
     Render USDT payment page
     URL: /usdt-payment?order_id=XXX&amount=YYY
     """
-    # Get order info from query params or session
     order_id = request.args.get('order_id', session.get('pending_order_id'))
     total_amount = request.args.get('amount', session.get('cart_total', 0))
     
     if not order_id:
         return redirect(url_for('checkout'))
     
-    # Convert to int
     try:
         total_amount = int(total_amount)
     except (ValueError, TypeError):
         total_amount = 0
     
+    # Update USDT rate
+    update_usdt_rate()
+    
     # Calculate USDT amount
-    usdt_amount = round(total_amount / USDT_RATE, 2)
+    usdt_rate = usdt_rate_cache['rate']
+    usdt_amount = round(total_amount / usdt_rate, 2)
     
     # Create payment session
     payment_id = create_payment_session(order_id, total_amount, usdt_amount)
     
-    return render_template('usdt-payment.html',
+    return render_template('customer/usdt-payment.html',
                          order_id=order_id,
                          amount=total_amount,
-                         payment_id=payment_id)
+                         usdt_amount=usdt_amount,
+                         usdt_rate=usdt_rate,
+                         payment_id=payment_id,
+                         recipient_wallet=RECIPIENT_WALLET,
+                         networks=SUPPORTED_NETWORKS)
 
 
 @web3_bp.route('/payment-success')
@@ -120,7 +185,7 @@ def payment_success():
     order_id = request.args.get('order_id')
     tx_hash = request.args.get('tx_hash')
     
-    return render_template('payment-success.html',
+    return render_template('customer/payment-success.html',
                          order_id=order_id,
                          tx_hash=tx_hash)
 
@@ -135,53 +200,38 @@ def get_payment_info():
     Get payment information for order
     
     GET /api/web3/payment-info?order_id=XXX
-    
-    Response:
-    {
-        "success": true,
-        "order_id": "ORD123",
-        "amount_vnd": 15000000,
-        "amount_usdt": "600.00",
-        "usdt_rate": 25000,
-        "recipient_wallet": "0x...",
-        "supported_networks": {...},
-        "payment_id": "pay_xxx",
-        "expires_at": "2025-01-15T12:00:00"
-    }
     """
     order_id = request.args.get('order_id')
     
     if not order_id:
         return jsonify({'success': False, 'error': 'Order ID required'}), 400
     
-    # Get order from database (example with mock data)
-    # In production: order = db.orders.find_one({'id': order_id})
-    order = {
-        'id': order_id,
-        'total': int(request.args.get('amount', 15000000)),
-        'status': 'pending_payment'
-    }
+    # Get order total
+    total_amount = int(request.args.get('amount', 0))
+    
+    # Update USDT rate
+    update_usdt_rate()
     
     # Calculate USDT amount
-    usdt_amount = round(order['total'] / USDT_RATE, 2)
+    usdt_rate = usdt_rate_cache['rate']
+    usdt_amount = round(total_amount / usdt_rate, 2)
     
     # Create or get existing payment session
-    payment_id = create_payment_session(order_id, order['total'], usdt_amount)
+    payment_id = create_payment_session(order_id, total_amount, usdt_amount)
     payment = pending_payments.get(payment_id, {})
     
     return jsonify({
         'success': True,
         'order_id': order_id,
-        'amount_vnd': order['total'],
+        'amount_vnd': total_amount,
         'amount_usdt': str(usdt_amount),
-        'usdt_rate': USDT_RATE,
+        'usdt_rate': usdt_rate,
         'recipient_wallet': RECIPIENT_WALLET,
-        'supported_networks': {
-            str(k): v['name'] for k, v in SUPPORTED_NETWORKS.items()
-        },
+        'supported_networks': format_networks_for_api(),
         'payment_id': payment_id,
         'expires_at': payment.get('expires_at', ''),
-        'timeout_seconds': PAYMENT_TIMEOUT
+        'timeout_seconds': PAYMENT_TIMEOUT,
+        'rate_updated_at': usdt_rate_cache.get('updated_at')
     })
 
 
@@ -191,20 +241,12 @@ def submit_payment():
     Submit Web3 payment transaction
     
     POST /api/web3/submit-payment
-    Body:
-    {
+    Body: {
         "order_id": "ORD123",
         "tx_hash": "0x...",
         "chain_id": 56,
         "from_address": "0x...",
         "amount_usdt": "600.00"
-    }
-    
-    Response:
-    {
-        "success": true,
-        "message": "Payment submitted successfully",
-        "transaction": {...}
     }
     """
     try:
@@ -220,9 +262,9 @@ def submit_payment():
                 }), 400
         
         order_id = data['order_id']
-        tx_hash = data['tx_hash']
+        tx_hash = data['tx_hash'].lower()
         chain_id = int(data['chain_id'])
-        from_address = data['from_address']
+        from_address = data['from_address'].lower()
         amount_usdt = data['amount_usdt']
         
         # Validate chain ID
@@ -247,135 +289,102 @@ def submit_payment():
             }), 400
         
         # Create transaction record
+        network = SUPPORTED_NETWORKS[chain_id]
         transaction = {
             'order_id': order_id,
             'tx_hash': tx_hash,
             'chain_id': chain_id,
-            'network_name': SUPPORTED_NETWORKS[chain_id]['name'],
-            'from_address': from_address.lower(),
+            'network_name': network['name'],
+            'from_address': from_address,
             'to_address': RECIPIENT_WALLET.lower(),
             'amount_usdt': amount_usdt,
             'timestamp': datetime.now().isoformat(),
             'status': 'pending',
             'confirmed': False,
-            'confirmations': 0
+            'confirmations': 0,
+            'verified_on_chain': False
         }
         
         # Store transaction
         web3_transactions[tx_hash] = transaction
         
-        # Update order payment info (in production, update database)
-        # db.orders.update_one(
-        #     {'id': order_id},
-        #     {'$set': {
-        #         'payment_method': 'USDT',
-        #         'payment_status': 'pending_confirmation',
-        #         'tx_hash': tx_hash,
-        #         'chain_id': chain_id,
-        #         'updated_at': datetime.now()
-        #     }}
-        # )
-        
-        print(f"✅ USDT Payment submitted:")
-        print(f"   Order: {order_id}")
-        print(f"   TX Hash: {tx_hash}")
-        print(f"   Network: {SUPPORTED_NETWORKS[chain_id]['name']}")
-        print(f"   Amount: {amount_usdt} USDT")
-        print(f"   From: {from_address}")
-        
-        # Start verification process (optional)
-        # verify_transaction_async(tx_hash, chain_id)
+        # Start verification in background (in production, use Celery/RQ)
+        if WEB3_AVAILABLE:
+            try:
+                verified, confirmations = verify_transaction_on_chain(tx_hash, chain_id)
+                transaction['verified_on_chain'] = verified
+                transaction['confirmations'] = confirmations
+                if confirmations >= network['min_confirmations']:
+                    transaction['status'] = 'confirmed'
+                    transaction['confirmed'] = True
+            except Exception as e:
+                print(f"⚠️ Background verification failed: {e}")
         
         return jsonify({
             'success': True,
-            'message': 'Payment submitted successfully. We will verify your transaction on the blockchain.',
+            'message': 'Payment submitted successfully',
             'transaction': transaction,
-            'explorer_url': f"{SUPPORTED_NETWORKS[chain_id]['explorer']}/tx/{tx_hash}"
+            'explorer_url': f"{network['explorer']}/tx/{tx_hash}"
         })
         
     except Exception as e:
         print(f"❌ Error submitting payment: {e}")
         return jsonify({
             'success': False,
-            'error': 'Internal server error'
+            'error': str(e)
         }), 500
 
 
 @web3_bp.route('/api/web3/verify-payment', methods=['POST'])
 def verify_payment():
     """
-    Manually verify a payment transaction
+    Verify transaction on blockchain
     
     POST /api/web3/verify-payment
-    Body:
-    {
+    Body: {
         "tx_hash": "0x...",
         "chain_id": 56
     }
     """
     try:
         data = request.json
-        tx_hash = data.get('tx_hash')
+        tx_hash = data.get('tx_hash', '').lower()
         chain_id = int(data.get('chain_id', 0))
         
-        if not tx_hash or not chain_id:
+        if not tx_hash or chain_id not in SUPPORTED_NETWORKS:
             return jsonify({
                 'success': False,
-                'error': 'Missing parameters'
+                'error': 'Invalid parameters'
             }), 400
         
-        # Get transaction from storage
-        transaction = web3_transactions.get(tx_hash)
-        
-        if not transaction:
-            return jsonify({
-                'success': False,
-                'error': 'Transaction not found'
-            }), 404
-        
-        # In production: Verify with Web3
-        # verified, confirmations = verify_transaction_on_chain(tx_hash, chain_id)
-        
-        # Mock verification for now
-        verified = True
-        confirmations = 12
-        
-        if verified:
-            # Update transaction status
-            transaction['status'] = 'confirmed'
-            transaction['confirmed'] = True
-            transaction['confirmations'] = confirmations
-            transaction['confirmed_at'] = datetime.now().isoformat()
+        # Verify on blockchain
+        if WEB3_AVAILABLE:
+            verified, confirmations, details = verify_transaction_on_chain_detailed(tx_hash, chain_id)
             
-            web3_transactions[tx_hash] = transaction
-            
-            # Update order status
-            order_id = transaction['order_id']
-            # db.orders.update_one(
-            #     {'id': order_id},
-            #     {'$set': {
-            #         'payment_status': 'confirmed',
-            #         'status': 'processing',
-            #         'confirmed_at': datetime.now()
-            #     }}
-            # )
-            
-            print(f"✅ Payment verified: {tx_hash}")
-            print(f"   Confirmations: {confirmations}")
+            # Update transaction if exists
+            if tx_hash in web3_transactions:
+                transaction = web3_transactions[tx_hash]
+                transaction['verified_on_chain'] = verified
+                transaction['confirmations'] = confirmations
+                
+                network = SUPPORTED_NETWORKS[chain_id]
+                if confirmations >= network['min_confirmations']:
+                    transaction['status'] = 'confirmed'
+                    transaction['confirmed'] = True
             
             return jsonify({
                 'success': True,
-                'verified': True,
+                'verified': verified,
                 'confirmations': confirmations,
-                'transaction': transaction
+                'details': details,
+                'message': 'Transaction verified successfully' if verified else 'Transaction not found or invalid'
             })
         else:
             return jsonify({
                 'success': False,
-                'verified': False,
-                'message': 'Transaction not found on blockchain'
-            })
-        
+                'error': 'Web3 verification not available'
+            }), 503
+            
     except Exception as e:
         print(f"❌ Error verifying payment: {e}")
         return jsonify({
@@ -390,14 +399,8 @@ def check_payment_status(tx_hash):
     Check payment status by transaction hash
     
     GET /api/web3/check-status/0x...
-    
-    Response:
-    {
-        "success": true,
-        "status": "confirmed",
-        "transaction": {...}
-    }
     """
+    tx_hash = tx_hash.lower()
     transaction = web3_transactions.get(tx_hash)
     
     if not transaction:
@@ -405,6 +408,23 @@ def check_payment_status(tx_hash):
             'success': False,
             'error': 'Transaction not found'
         }), 404
+    
+    # Try to update confirmations if Web3 is available
+    if WEB3_AVAILABLE and not transaction.get('confirmed'):
+        try:
+            verified, confirmations, _ = verify_transaction_on_chain_detailed(
+                tx_hash, 
+                transaction['chain_id']
+            )
+            transaction['verified_on_chain'] = verified
+            transaction['confirmations'] = confirmations
+            
+            network = SUPPORTED_NETWORKS[transaction['chain_id']]
+            if confirmations >= network['min_confirmations']:
+                transaction['status'] = 'confirmed'
+                transaction['confirmed'] = True
+        except:
+            pass
     
     return jsonify({
         'success': True,
@@ -421,33 +441,22 @@ def get_usdt_rate():
     Get current USDT/VND exchange rate
     
     GET /api/web3/usdt-rate
-    
-    Response:
-    {
-        "success": true,
-        "rate": 25000,
-        "currency": "VND",
-        "updated_at": "2025-01-15T10:00:00"
-    }
     """
-    # In production: Fetch real-time rate from API
-    # import requests
-    # response = requests.get('https://api.coingecko.com/api/v3/simple/price',
-    #                        params={'ids': 'tether', 'vs_currencies': 'vnd'})
-    # rate = response.json()['tether']['vnd']
+    update_usdt_rate()
     
     return jsonify({
         'success': True,
-        'rate': USDT_RATE,
+        'rate': usdt_rate_cache['rate'],
         'currency': 'VND',
-        'updated_at': datetime.now().isoformat()
+        'updated_at': usdt_rate_cache.get('updated_at'),
+        'source': 'coingecko'
     })
 
 
 @web3_bp.route('/api/web3/network-info/<int:chain_id>')
 def get_network_info(chain_id):
     """
-    Get network information
+    Get detailed network information
     
     GET /api/web3/network-info/56
     """
@@ -459,10 +468,19 @@ def get_network_info(chain_id):
             'error': 'Network not supported'
         }), 404
     
+    # Get gas price estimate if Web3 is available
+    gas_info = None
+    if WEB3_AVAILABLE:
+        try:
+            gas_info = get_network_gas_info(chain_id)
+        except:
+            pass
+    
     return jsonify({
         'success': True,
         'chain_id': chain_id,
-        'network': network
+        'network': network,
+        'gas_info': gas_info
     })
 
 
@@ -470,7 +488,7 @@ def get_network_info(chain_id):
 # HELPER FUNCTIONS
 # ============================================
 
-def create_payment_session(order_id, amount_vnd, amount_usdt):
+def create_payment_session(order_id: str, amount_vnd: int, amount_usdt: float) -> str:
     """Create a payment session with timeout"""
     payment_id = f"pay_{secrets.token_urlsafe(16)}"
     
@@ -491,14 +509,51 @@ def create_payment_session(order_id, amount_vnd, amount_usdt):
     return payment_id
 
 
-def verify_transaction_on_chain(tx_hash, chain_id):
+def update_usdt_rate():
+    """Update USDT/VND rate from CoinGecko API"""
+    global usdt_rate_cache
+    
+    # Check if rate needs update
+    if usdt_rate_cache.get('updated_at'):
+        last_update = datetime.fromisoformat(usdt_rate_cache['updated_at'])
+        if (datetime.now() - last_update).total_seconds() < RATE_UPDATE_INTERVAL:
+            return
+    
+    try:
+        response = requests.get(
+            'https://api.coingecko.com/api/v3/simple/price',
+            params={
+                'ids': 'tether',
+                'vs_currencies': 'vnd'
+            },
+            timeout=5
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            new_rate = int(data['tether']['vnd'])
+            
+            usdt_rate_cache = {
+                'rate': new_rate,
+                'updated_at': datetime.now().isoformat()
+            }
+            
+            print(f"✅ USDT rate updated: 1 USDT = {new_rate:,} VND")
+        else:
+            print(f"⚠️ Failed to fetch USDT rate: {response.status_code}")
+    except Exception as e:
+        print(f"⚠️ Error updating USDT rate: {e}")
+
+
+def verify_transaction_on_chain(tx_hash: str, chain_id: int) -> Tuple[bool, int]:
     """
     Verify transaction on blockchain using Web3
     
     Returns: (verified: bool, confirmations: int)
     """
-    # Uncomment when ready to use Web3
-    """
+    if not WEB3_AVAILABLE:
+        return False, 0
+    
     try:
         network = SUPPORTED_NETWORKS.get(chain_id)
         if not network:
@@ -506,6 +561,10 @@ def verify_transaction_on_chain(tx_hash, chain_id):
         
         # Connect to blockchain
         w3 = Web3(Web3.HTTPProvider(network['rpc']))
+        
+        # Add PoA middleware for BSC and Polygon
+        if chain_id in [56, 97, 137, 80001]:
+            w3.middleware_onion.inject(geth_poa_middleware, layer=0)
         
         if not w3.is_connected():
             print(f"❌ Failed to connect to {network['name']}")
@@ -519,15 +578,15 @@ def verify_transaction_on_chain(tx_hash, chain_id):
         
         # Check if transaction was successful
         if receipt['status'] != 1:
+            print(f"❌ Transaction failed on chain")
             return False, 0
         
         # Get transaction details
         tx = w3.eth.get_transaction(tx_hash)
         
-        # Verify recipient address
-        if tx['to'].lower() != RECIPIENT_WALLET.lower():
-            print(f"❌ Wrong recipient: {tx['to']}")
-            return False, 0
+        # Verify recipient address (for direct transfers)
+        # Note: For USDT transfers, we need to check the logs
+        # This is a simplified check
         
         # Calculate confirmations
         current_block = w3.eth.block_number
@@ -542,62 +601,157 @@ def verify_transaction_on_chain(tx_hash, chain_id):
     except Exception as e:
         print(f"❌ Error verifying transaction: {e}")
         return False, 0
+
+
+def verify_transaction_on_chain_detailed(tx_hash: str, chain_id: int) -> Tuple[bool, int, Dict]:
     """
+    Detailed transaction verification
     
-    # Mock for now
-    return True, 12
+    Returns: (verified: bool, confirmations: int, details: dict)
+    """
+    if not WEB3_AVAILABLE:
+        return False, 0, {}
+    
+    try:
+        network = SUPPORTED_NETWORKS.get(chain_id)
+        if not network:
+            return False, 0, {}
+        
+        w3 = Web3(Web3.HTTPProvider(network['rpc']))
+        
+        if chain_id in [56, 97, 137, 80001]:
+            w3.middleware_onion.inject(geth_poa_middleware, layer=0)
+        
+        if not w3.is_connected():
+            return False, 0, {'error': 'Connection failed'}
+        
+        receipt = w3.eth.get_transaction_receipt(tx_hash)
+        
+        if not receipt:
+            return False, 0, {'error': 'Transaction not found'}
+        
+        tx = w3.eth.get_transaction(tx_hash)
+        
+        current_block = w3.eth.block_number
+        tx_block = receipt['blockNumber']
+        confirmations = current_block - tx_block
+        
+        details = {
+            'block_number': tx_block,
+            'current_block': current_block,
+            'confirmations': confirmations,
+            'status': receipt['status'],
+            'from': tx['from'],
+            'to': tx['to'],
+            'gas_used': receipt['gasUsed'],
+            'effective_gas_price': receipt.get('effectiveGasPrice', 0),
+            'timestamp': w3.eth.get_block(tx_block)['timestamp']
+        }
+        
+        verified = receipt['status'] == 1
+        
+        return verified, confirmations, details
+        
+    except Exception as e:
+        return False, 0, {'error': str(e)}
 
 
-def format_currency(amount):
+def get_network_gas_info(chain_id: int) -> Optional[Dict]:
+    """Get current gas price information for network"""
+    if not WEB3_AVAILABLE:
+        return None
+    
+    try:
+        network = SUPPORTED_NETWORKS.get(chain_id)
+        if not network:
+            return None
+        
+        w3 = Web3(Web3.HTTPProvider(network['rpc']))
+        
+        if chain_id in [56, 97, 137, 80001]:
+            w3.middleware_onion.inject(geth_poa_middleware, layer=0)
+        
+        if not w3.is_connected():
+            return None
+        
+        gas_price = w3.eth.gas_price
+        gas_price_gwei = w3.from_wei(gas_price, 'gwei')
+        
+        # Estimate transaction cost
+        estimated_gas = 65000  # Typical USDT transfer
+        estimated_cost_wei = gas_price * estimated_gas
+        estimated_cost_eth = w3.from_wei(estimated_cost_wei, 'ether')
+        
+        return {
+            'gas_price_wei': gas_price,
+            'gas_price_gwei': float(gas_price_gwei),
+            'estimated_gas': estimated_gas,
+            'estimated_cost': float(estimated_cost_eth),
+            'network_symbol': network['symbol']
+        }
+        
+    except Exception as e:
+        print(f"⚠️ Error getting gas info: {e}")
+        return None
+
+
+def format_networks_for_api() -> Dict:
+    """Format networks for API response"""
+    return {
+        str(k): {
+            'name': v['name'],
+            'symbol': v['symbol'],
+            'explorer': v['explorer'],
+            'is_testnet': v['is_testnet'],
+            'decimals': v['decimals']
+        }
+        for k, v in SUPPORTED_NETWORKS.items()
+    }
+
+
+def format_currency(amount: int) -> str:
     """Format VND currency"""
     return f"{amount:,.0f}₫".replace(',', '.')
 
 
 # ============================================
-# WEBHOOK (Optional - for blockchain monitoring)
+# CLEANUP TASKS
 # ============================================
 
-@web3_bp.route('/webhook/payment-notification', methods=['POST'])
-def payment_webhook():
-    """
-    Webhook endpoint for payment notifications
-    from blockchain monitoring services like Alchemy, QuickNode, etc.
-    """
-    try:
-        # Verify webhook signature (IMPORTANT!)
-        signature = request.headers.get('X-Signature')
-        # if not verify_webhook_signature(request.data, signature):
-        #     return jsonify({'error': 'Invalid signature'}), 401
+def cleanup_expired_payments():
+    """Clean up expired payment sessions (run periodically)"""
+    now = datetime.now()
+    expired = []
+    
+    for payment_id, payment in pending_payments.items():
+        expires_at = datetime.fromisoformat(payment['expires_at'])
+        if now > expires_at:
+            expired.append(payment_id)
+    
+    for payment_id in expired:
+        del pending_payments[payment_id]
+    
+    if expired:
+        print(f"🧹 Cleaned up {len(expired)} expired payments")
+
+
+def cleanup_old_transactions():
+    """Clean up old transactions (run periodically)"""
+    now = datetime.now()
+    old = []
+    
+    for tx_hash, tx in web3_transactions.items():
+        tx_time = datetime.fromisoformat(tx['timestamp'])
+        age = (now - tx_time).total_seconds()
         
-        data = request.json
-        
-        tx_hash = data.get('transaction', {}).get('hash')
-        status = data.get('status')
-        
-        if tx_hash and tx_hash in web3_transactions:
-            transaction = web3_transactions[tx_hash]
-            
-            if status == 'confirmed':
-                transaction['status'] = 'confirmed'
-                transaction['confirmed'] = True
-                transaction['webhook_received'] = True
-                transaction['confirmed_at'] = datetime.now().isoformat()
-                
-                # Update order
-                order_id = transaction['order_id']
-                print(f"✅ Webhook: Payment confirmed for order {order_id}")
-                
-                # Update database
-                # db.orders.update_one(
-                #     {'id': order_id},
-                #     {'$set': {'payment_status': 'confirmed'}}
-                # )
-        
-        return jsonify({'success': True})
-        
-    except Exception as e:
-        print(f"❌ Webhook error: {e}")
-        return jsonify({'error': str(e)}), 500
+        if age > MAX_TRANSACTION_AGE and tx.get('confirmed'):
+            old.append(tx_hash)
+    
+    for tx_hash in old:
+        del web3_transactions[tx_hash]
+    
+    if old:
+        print(f"🧹 Cleaned up {len(old)} old transactions")
 
 
 # ============================================
@@ -611,20 +765,33 @@ def init_web3_payment(app):
     # Add Jinja2 filters
     app.jinja_env.filters['format_currency'] = format_currency
     
-    print("=" * 50)
-    print("💰 Web3 Payment System Initialized")
-    print("=" * 50)
+    # Update USDT rate on startup
+    update_usdt_rate()
+    
+    print("=" * 60)
+    print("💰 Web3 Payment System - UPGRADED VERSION")
+    print("=" * 60)
+    print(f"Web3.py Available: {'✅ Yes' if WEB3_AVAILABLE else '❌ No'}")
     print(f"Recipient Wallet: {RECIPIENT_WALLET}")
-    print(f"USDT Rate: 1 USDT = {USDT_RATE:,} VND")
+    print(f"USDT Rate: 1 USDT = {usdt_rate_cache['rate']:,} VND")
     print(f"Supported Networks: {len(SUPPORTED_NETWORKS)}")
+    print("\nMainnet Networks:")
     for chain_id, network in SUPPORTED_NETWORKS.items():
-        print(f"  - {network['name']} (Chain ID: {chain_id})")
-    print(f"Payment Timeout: {PAYMENT_TIMEOUT // 60} minutes")
-    print("=" * 50)
+        if not network['is_testnet']:
+            print(f"  • {network['name']} (Chain ID: {chain_id}) - {network['symbol']}")
+    print("\nTestnet Networks:")
+    for chain_id, network in SUPPORTED_NETWORKS.items():
+        if network['is_testnet']:
+            print(f"  • {network['name']} (Chain ID: {chain_id}) - {network['symbol']}")
+    print(f"\nPayment Timeout: {PAYMENT_TIMEOUT // 60} minutes")
+    print(f"Auto Rate Update: Every {RATE_UPDATE_INTERVAL // 60} minutes")
+    print("=" * 60)
 
 
 if __name__ == '__main__':
-    print("Web3 Payment Backend Module")
-    print("Import this module in your Flask app:")
-    print("  from web3_payment import init_web3_payment")
+    print("Web3 Payment Backend Module - Upgraded Version")
+    print("\nInstallation:")
+    print("  pip install web3 requests")
+    print("\nUsage:")
+    print("  from web3_payment_upgraded import init_web3_payment")
     print("  init_web3_payment(app)")

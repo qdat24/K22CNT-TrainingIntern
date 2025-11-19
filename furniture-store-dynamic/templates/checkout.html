@@ -11,7 +11,6 @@
         padding: 2rem 0;
     }
 
-    /* Page Header */
     .checkout-header {
         background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
         color: white;
@@ -32,7 +31,6 @@
         opacity: 0.9;
     }
 
-    /* Main Layout */
     .checkout-container {
         max-width: 1400px;
         margin: 0 auto;
@@ -46,7 +44,6 @@
         align-items: start;
     }
 
-    /* Form Cards */
     .checkout-card {
         background: white;
         padding: 2.5rem;
@@ -78,7 +75,6 @@
         font-size: 1.3rem;
     }
 
-    /* Form Inputs */
     .form-group {
         margin-bottom: 1.5rem;
     }
@@ -129,7 +125,6 @@
         min-height: 100px;
     }
 
-    /* Payment Methods */
     .payment-methods {
         display: flex;
         flex-direction: column;
@@ -193,7 +188,6 @@
         line-height: 1.4;
     }
 
-    /* USDT Payment Option - Special Styling */
     .payment-option.usdt-option {
         background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
         border-color: #e0e6ed;
@@ -227,7 +221,6 @@
         font-weight: 700;
     }
 
-    /* Order Summary Sidebar */
     .order-summary {
         position: sticky;
         top: 100px;
@@ -256,7 +249,6 @@
         color: #3498db;
     }
 
-    /* Cart Items in Summary */
     .summary-items {
         max-height: 350px;
         overflow-y: auto;
@@ -328,7 +320,6 @@
         font-size: 1rem;
     }
 
-    /* Summary Rows */
     .summary-row {
         display: flex;
         justify-content: space-between;
@@ -361,7 +352,6 @@
         font-weight: 700;
     }
 
-    /* Buttons */
     .btn-submit {
         width: 100%;
         padding: 16px;
@@ -410,7 +400,6 @@
         background: rgba(52, 152, 219, 0.1);
     }
 
-    /* Security Badge */
     .security-badge {
         background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
         padding: 1.3rem;
@@ -432,13 +421,11 @@
         font-size: 1rem;
     }
 
-    /* Responsive Design */
     @media (max-width: 1024px) {
         .checkout-grid {
             grid-template-columns: 1fr;
             gap: 2rem;
         }
-
         .order-summary {
             position: static;
         }
@@ -448,25 +435,20 @@
         .checkout-header h1 {
             font-size: 2rem;
         }
-
         .checkout-card {
             padding: 1.5rem;
         }
-
         .form-row {
             grid-template-columns: 1fr;
         }
-
         .payment-option {
             padding: 1rem;
         }
-
         .summary-items {
             max-height: 250px;
         }
     }
 
-    /* Loading Animation */
     @keyframes spin {
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
@@ -478,7 +460,6 @@
 </style>
 
 <div class="checkout-page">
-    <!-- Page Header -->
     <div class="checkout-header">
         <div class="container">
             <h1>
@@ -488,15 +469,13 @@
         </div>
     </div>
 
-    <!-- Checkout Content -->
     <div class="checkout-container">
         <div class="checkout-grid">
             
-            <!-- Left Column: Checkout Form -->
             <div>
-                <form id="checkoutForm" onsubmit="submitOrder(event)">
+                <!-- ✅ KHÔNG CÓ FORM TAG -->
+                <div id="checkoutFormData">
                     
-                    <!-- Shipping Information -->
                     <div class="checkout-card">
                         <h2 class="card-title">
                             <i class="fas fa-shipping-fast"></i> Thông Tin Giao Hàng
@@ -505,14 +484,14 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label class="form-label">Họ và tên <span class="required">*</span></label>
-                                <input type="text" name="fullname" required 
+                                <input type="text" id="fullname" required 
                                        class="form-input"
                                        value="{% if customer %}{{ customer.full_name }}{% endif %}"
                                        placeholder="Nguyễn Văn A">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Số điện thoại <span class="required">*</span></label>
-                                <input type="tel" name="phone" required pattern="[0-9]{10,11}"
+                                <input type="tel" id="phone" required pattern="[0-9]{10,11}"
                                        class="form-input"
                                        value="{% if customer %}{{ customer.phone }}{% endif %}"
                                        placeholder="0912345678">
@@ -521,7 +500,7 @@
                         
                         <div class="form-group">
                             <label class="form-label">Email <span class="required">*</span></label>
-                            <input type="email" name="email" required
+                            <input type="email" id="email" required
                                    class="form-input"
                                    value="{% if customer %}{{ customer.email }}{% endif %}"
                                    placeholder="example@email.com">
@@ -529,7 +508,7 @@
                         
                         <div class="form-group">
                             <label class="form-label">Địa chỉ giao hàng <span class="required">*</span></label>
-                            <input type="text" name="address" required
+                            <input type="text" id="address" required
                                    class="form-input"
                                    value="{% if customer %}{{ customer.address }}{% endif %}"
                                    placeholder="Số nhà, tên đường">
@@ -538,7 +517,7 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label class="form-label">Tỉnh/Thành phố <span class="required">*</span></label>
-                                <select name="city" required class="form-select">
+                                <select id="city" required class="form-select">
                                     <option value="">Chọn tỉnh/thành</option>
                                     <option value="Hà Nội">Hà Nội</option>
                                     <option value="TP. Hồ Chí Minh">TP. Hồ Chí Minh</option>
@@ -549,13 +528,13 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Quận/Huyện <span class="required">*</span></label>
-                                <input type="text" name="district" required
+                                <input type="text" id="district" required
                                        class="form-input"
                                        placeholder="Quận/Huyện">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Phường/Xã <span class="required">*</span></label>
-                                <input type="text" name="ward" required
+                                <input type="text" id="ward" required
                                        class="form-input"
                                        placeholder="Phường/Xã">
                             </div>
@@ -563,20 +542,18 @@
                         
                         <div class="form-group">
                             <label class="form-label">Ghi chú (tùy chọn)</label>
-                            <textarea name="note" class="form-textarea"
-                                      placeholder="Ghi chú về đơn hàng, ví dụ: giao giờ hành chính..."></textarea>
+                            <textarea id="note" class="form-textarea"
+                                      placeholder="Ghi chú về đơn hàng..."></textarea>
                         </div>
                     </div>
                     
-                    <!-- Payment Methods -->
                     <div class="checkout-card">
                         <h2 class="card-title">
                             <i class="fas fa-wallet"></i> Phương Thức Thanh Toán
                         </h2>
                         
                         <div class="payment-methods">
-                            <!-- COD Payment -->
-                            <label class="payment-option active" onclick="selectPayment(this, 'cod')">
+                            <label class="payment-option active" onclick="selectPayment('cod', this)">
                                 <input type="radio" name="payment_method" value="cod" checked class="payment-radio">
                                 <div class="payment-content">
                                     <div class="payment-title">
@@ -589,8 +566,7 @@
                                 </div>
                             </label>
                             
-                            <!-- Bank Transfer -->
-                            <label class="payment-option" onclick="selectPayment(this, 'bank_transfer')">
+                            <label class="payment-option" onclick="selectPayment('bank_transfer', this)">
                                 <input type="radio" name="payment_method" value="bank_transfer" class="payment-radio">
                                 <div class="payment-content">
                                     <div class="payment-title">
@@ -603,8 +579,7 @@
                                 </div>
                             </label>
                             
-                            <!-- Credit Card -->
-                            <label class="payment-option" onclick="selectPayment(this, 'credit_card')">
+                            <label class="payment-option" onclick="selectPayment('credit_card', this)">
                                 <input type="radio" name="payment_method" value="credit_card" class="payment-radio">
                                 <div class="payment-content">
                                     <div class="payment-title">
@@ -617,8 +592,7 @@
                                 </div>
                             </label>
                             
-                            <!-- USDT Crypto Payment -->
-                            <label class="payment-option usdt-option" onclick="selectPayment(this, 'usdt')">
+                            <label class="payment-option usdt-option" onclick="selectPayment('usdt', this)">
                                 <input type="radio" name="payment_method" value="usdt" class="payment-radio">
                                 <div class="payment-content">
                                     <div class="payment-title">
@@ -635,17 +609,15 @@
                         </div>
                     </div>
                     
-                </form>
+                </div>
             </div>
             
-            <!-- Right Column: Order Summary -->
             <div class="order-summary">
                 <div class="summary-card">
                     <h3 class="summary-title">
                         <i class="fas fa-shopping-bag"></i> Đơn Hàng Của Bạn
                     </h3>
                     
-                    <!-- Cart Items -->
                     <div class="summary-items">
                         {% for item in cart_items %}
                         <div class="summary-item">
@@ -653,16 +625,15 @@
                             <div class="item-details">
                                 <div class="item-name">{{ item.product.name }}</div>
                                 <div class="item-quantity">Số lượng: {{ item.quantity }}</div>
-                                <div class="item-price">{{ item.subtotal | format_currency }}</div>
+                                <div class="item-price">{{ item.subtotal | format_currency }}₫</div>
                             </div>
                         </div>
                         {% endfor %}
                     </div>
                     
-                    <!-- Summary Totals -->
                     <div class="summary-row">
                         <span>Tạm tính:</span>
-                        <span>{{ subtotal | format_currency }}</span>
+                        <span>{{ subtotal | format_currency }}₫</span>
                     </div>
                     <div class="summary-row">
                         <span>Phí vận chuyển:</span>
@@ -670,27 +641,25 @@
                             {% if subtotal >= 5000000 %}
                             <span class="free-shipping">Miễn phí ✓</span>
                             {% else %}
-                            {{ shipping_fee | format_currency }}
+                            {{ shipping_fee | format_currency }}₫
                             {% endif %}
                         </span>
                     </div>
                     <div class="summary-row summary-total-row">
                         <span class="label">Tổng cộng:</span>
-                        <span class="amount">{{ total | format_currency }}</span>
+                        <span class="amount">{{ total | format_currency }}₫</span>
                     </div>
                     
-                    <!-- Submit Button -->
-                    <button type="submit" form="checkoutForm" class="btn-submit">
+                    <!-- ✅ BUTTON ONCLICK - KHÔNG CÓ FORM -->
+                    <button onclick="handleCheckout()" class="btn-submit" id="submitBtn">
                         <i class="fas fa-check-circle"></i> Hoàn Tất Đơn Hàng
                     </button>
                     
-                    <!-- Back to Cart Link -->
                     <a href="/cart" class="btn-back">
                         <i class="fas fa-arrow-left"></i> Quay lại giỏ hàng
                     </a>
                 </div>
                 
-                <!-- Security Badge -->
                 <div class="security-badge">
                     <i class="fas fa-shield-alt"></i>
                     <div>
@@ -707,139 +676,146 @@
 </div>
 
 <script>
-// Select payment method
-function selectPayment(element, method) {
-    // Remove active class from all options
-    document.querySelectorAll('.payment-option').forEach(option => {
-        option.classList.remove('active');
+let selectedPaymentMethod = 'cod';
+
+function selectPayment(method, element) {
+    selectedPaymentMethod = method;
+    
+    document.querySelectorAll('.payment-option').forEach(opt => {
+        opt.classList.remove('active');
     });
     
-    // Add active class to selected option
     element.classList.add('active');
+    element.querySelector('input').checked = true;
     
-    // Check the radio button
-    element.querySelector('input[type="radio"]').checked = true;
+    console.log('Selected payment:', method);
 }
 
-// Submit order form
-async function submitOrder(event) {
-    event.preventDefault();
+function getFormData() {
+    return {
+        fullname: document.getElementById('fullname').value,
+        phone: document.getElementById('phone').value,
+        email: document.getElementById('email').value,
+        address: document.getElementById('address').value,
+        city: document.getElementById('city').value,
+        district: document.getElementById('district').value,
+        ward: document.getElementById('ward').value,
+        note: document.getElementById('note').value,
+        payment_method: selectedPaymentMethod
+    };
+}
+
+function validateForm(data) {
+    if (!data.fullname || !data.phone || !data.email || !data.address || 
+        !data.city || !data.district || !data.ward) {
+        alert('Vui lòng điền đầy đủ thông tin bắt buộc!');
+        return false;
+    }
     
-    const form = event.target;
-    const formData = new FormData(form);
-    const data = Object.fromEntries(formData.entries());
+    const phoneRegex = /^[0-9]{10,11}$/;
+    if (!phoneRegex.test(data.phone)) {
+        alert('Số điện thoại không hợp lệ!');
+        return false;
+    }
     
-    // Get submit button
-    const submitBtn = document.querySelector('.btn-submit');
-    if (!submitBtn) {
-        console.error('Submit button not found');
-        alert('Có lỗi xảy ra. Vui lòng tải lại trang!');
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(data.email)) {
+        alert('Email không hợp lệ!');
+        return false;
+    }
+    
+    return true;
+}
+
+function handleCheckout() {
+    console.log('🚀 CHECKOUT CLICKED!');
+    
+    const data = getFormData();
+    console.log('📋 Data:', data);
+    
+    if (!validateForm(data)) {
         return;
     }
     
-    // Validate payment method is selected
-    const paymentMethod = data.payment_method;
-    if (!paymentMethod) {
-        alert('Vui lòng chọn phương thức thanh toán!');
-        return;
-    }
+    const btn = document.getElementById('submitBtn');
     
     // ========================================
-    // SPECIAL HANDLING FOR USDT PAYMENT
+    // USDT PAYMENT - DIRECT REDIRECT
     // ========================================
-    if (paymentMethod === 'usdt') {
-        // For USDT: Redirect directly to payment page WITHOUT creating order
-        // Order will be created AFTER successful payment
+    if (selectedPaymentMethod === 'usdt') {
+        console.log('💰 USDT PAYMENT!');
         
-        console.log('USDT payment selected - redirecting to payment page...');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang chuyển...';
+        btn.disabled = true;
         
-        // Save order data to sessionStorage for later use
-        sessionStorage.setItem('pending_order_data', JSON.stringify(data));
-        sessionStorage.setItem('order_total', '{{ total }}');
-        
-        // Generate temporary order ID
-        const tempOrderId = 'TEMP' + Date.now();
-        
-        // Redirect to USDT payment page
-        window.location.href = '/static/usdt-payment.html?temp_id=' + tempOrderId + 
-                              '&amount={{ total }}' +
-                              '&name=' + encodeURIComponent(data.fullname) +
-                              '&email=' + encodeURIComponent(data.email);
-        return;
-    }
-    
-    // ========================================
-    // NORMAL PAYMENT FLOW (COD, Bank, Card)
-    // ========================================
-    
-    // Show loading state
-    const originalText = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
-    submitBtn.disabled = true;
-    
-    try {
-        // Call backend API
-        const response = await fetch('/api/place-order', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+        try {
+            sessionStorage.setItem('pending_order_data', JSON.stringify(data));
+            sessionStorage.setItem('order_total', '{{ total }}');
+        } catch (e) {
+            console.error('SessionStorage error:', e);
         }
         
-        const result = await response.json();
+        const tempId = 'TEMP' + Date.now();
+        const url = '/usdt-payment' +
+                   '?temp_id=' + tempId +
+                   '&amount={{ total }}' +
+                   '&name=' + encodeURIComponent(data.fullname) +
+                   '&email=' + encodeURIComponent(data.email) +
+                   '&phone=' + encodeURIComponent(data.phone);
         
-        // Handle response
+        console.log('🔀 Redirecting to:', url);
+        
+        setTimeout(() => {
+            window.location.href = url;
+        }, 500);
+        
+        return;
+    }
+    
+    // ========================================
+    // OTHER PAYMENT METHODS
+    // ========================================
+    console.log('💳 Processing payment...');
+    
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+    btn.disabled = true;
+    
+    fetch('/api/place-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+        console.log('📥 Result:', result);
+        
         if (result.success) {
-            console.log('Order placed successfully:', result);
-            
-            // Redirect based on payment method
             switch(result.redirect) {
                 case 'bank_transfer':
-                    console.log('Redirecting to bank transfer page...');
                     window.location.href = '/bank-transfer/' + result.order_id;
                     break;
-                    
                 case 'credit_card':
-                    console.log('Redirecting to credit card page...');
                     window.location.href = '/credit-card/' + result.order_id;
                     break;
-                    
                 default:
-                    // COD or other methods go to success page
-                    console.log('Redirecting to success page...');
                     window.location.href = '/order-success?order_id=' + result.order_id;
             }
         } else {
-            // Handle error
-            alert('Có lỗi xảy ra: ' + (result.message || 'Vui lòng thử lại'));
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
+            alert('Lỗi: ' + (result.message || 'Vui lòng thử lại'));
+            btn.innerHTML = originalText;
+            btn.disabled = false;
         }
-    } catch (error) {
-        console.error('Error placing order:', error);
-        alert('Không thể kết nối đến server. Vui lòng thử lại sau!');
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
-    }
+    })
+    .catch(error => {
+        console.error('❌ Error:', error);
+        alert('Không thể kết nối server!');
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    });
 }
 
-// Auto-select payment option when clicking anywhere on the card
-document.addEventListener('DOMContentLoaded', function() {
-    const paymentOptions = document.querySelectorAll('.payment-option');
-    
-    paymentOptions.forEach(option => {
-        option.addEventListener('click', function() {
-            const radio = this.querySelector('input[type="radio"]');
-            const method = radio.value;
-            selectPayment(this, method);
-        });
-    });
-});
+console.log('✅ Checkout script loaded');
 </script>
 
 {% endblock %}

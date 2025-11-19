@@ -1489,40 +1489,39 @@ def admin_delete_customer(customer_id):
     
     return redirect(url_for('admin_customers'))
 
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
-    # ============================================
-# THÊM ROUTE NÀY VÀO FILE app.py
-# ============================================
-
+@app.route('/usdt-payment')
 @app.route('/usdt-payment')
 def usdt_payment():
-    """
-    USDT Web3 Payment Page
-    URL: /usdt-payment?temp_id=XXX&amount=YYY
-    """
     temp_id = request.args.get('temp_id', '')
     amount = request.args.get('amount', 0)
     name = request.args.get('name', '')
     email = request.args.get('email', '')
+    phone = request.args.get('phone', '')
     
     try:
         amount = float(amount)
     except (ValueError, TypeError):
         amount = 0
     
-    # Calculate USDT amount
-    usdt_rate = 25000  # 1 USDT = 25,000 VND
+    usdt_rate = 25000
     usdt_amount = round(amount / usdt_rate, 2)
     
-    # Your wallet address for receiving USDT
-    recipient_address = '0x3fd86c3728b38cb6b09fa7d4914888dcfef1518c'  # THAY ĐỊA CHỈ CỦA BẠN
+    recipient_address = '0x3fd86c3728b38cb6b09fa7d4914888dcfef1518c'  # ⚠️ ĐỔI ĐỊA CHỈ VÍ
     
-    return render_template('usdt-payment.html',
+    print(f"\n💰 USDT Payment Page Loaded:")
+    print(f"   Order: {temp_id}")
+    print(f"   Amount: {amount:,.0f} VND")
+    print(f"   USDT: {usdt_amount}\n")
+    
+    return render_template('customer/usdt-payment.html',
                          temp_id=temp_id,
                          amount=amount,
                          usdt_amount=usdt_amount,
                          usdt_rate=usdt_rate,
                          recipient_address=recipient_address,
                          name=name,
-                         email=email)
+                         email=email,
+                         phone=phone)
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=5000)
